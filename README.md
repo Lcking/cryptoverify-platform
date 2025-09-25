@@ -1,8 +1,12 @@
 # CryptoVerify - Cryptocurrency Platform Verification Service
 
-A professional English website for cryptocurrency platform verification and review service, built with a blue technology-focused design.
+A professional English website for cryptocurrency platform verification and review service, built with a modern blue technology-focused design. This project provides comprehensive verification services for crypto trading platforms with real-time monitoring and fraud detection.
 
-## 🚀 Features
+🌐 **[Live Demo](http://localhost:3000)** | 📖 **[Documentation](#documentation)** | 🚀 **[Quick Start](#quick-start)**
+
+![CryptoVerify Screenshot](https://via.placeholder.com/800x400/1e40af/ffffff?text=CryptoVerify+-+Platform+Verification)
+
+## ✨ Features
 
 ### Core Services
 - **Platform Directory**: Comprehensive database of verified cryptocurrency trading platforms
