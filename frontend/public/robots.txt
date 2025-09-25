@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Block access to admin areas (if implemented later)
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://cryptoverify.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
