@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { TAGLINE_LINE1, TAGLINE_LINE2, HERO_SUBTEXT } from '../../config/brand';
 
 const HeroBanner = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -13,13 +14,16 @@ const HeroBanner = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Search functionality will be implemented later
-    console.log('Searching for:', searchQuery);
+    const q = (searchQuery || '').trim();
+    if (q.length === 0) return;
+    window.location.href = `/search?q=${encodeURIComponent(q)}`;
   };
 
   const handleHotSearch = (platform) => {
     setSearchQuery(platform);
   };
+
+  // Submit CTA removed (Navbar contains the primary entry)
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -37,16 +41,15 @@ const HeroBanner = () => {
       <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         {/* Main heading */}
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-          Verify Crypto Platforms
-          <span className="block text-blue-200">With Confidence</span>
+          {TAGLINE_LINE1}
+          <span className="block text-blue-200">{TAGLINE_LINE2}</span>
         </h1>
         
         <p className="text-lg sm:text-xl mb-12 text-blue-100 max-w-3xl mx-auto leading-relaxed">
-          Professional verification service for cryptocurrency trading platforms. 
-          Get real-time authenticity checks, security reviews, and fraud alerts.
+          {HERO_SUBTEXT}
         </p>
 
-        {/* Search form */}
+  {/* Search form */}
         <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-8">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
@@ -56,7 +59,7 @@ const HeroBanner = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for cryptocurrency platform..."
+              placeholder="Search for a platform..."
               className="w-full pl-14 pr-32 py-4 bg-white rounded-full text-gray-900 placeholder-gray-500 text-lg shadow-xl border-0 focus:ring-4 focus:ring-blue-300/50 focus:outline-none transition-all duration-300"
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-2">
@@ -69,6 +72,8 @@ const HeroBanner = () => {
             </div>
           </div>
         </form>
+
+        {/* Submit CTA moved to Navbar */}
 
         {/* Hot searches */}
         <div className="max-w-2xl mx-auto">
@@ -90,7 +95,7 @@ const HeroBanner = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto mt-16">
           <div className="text-center">
             <div className="text-3xl font-bold mb-2">500+</div>
-            <div className="text-blue-200 text-sm">Verified Platforms</div>
+            <div className="text-blue-200 text-sm">Verified Entries</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold mb-2">24/7</div>

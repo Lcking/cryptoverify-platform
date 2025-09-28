@@ -14,9 +14,20 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:3001": "set PORT=3001 && react-scripts start",
     "build": "react-scripts build",
+    "build:clean": "rimraf build && npm run build",
+    "preview": "serve -s build -l 5050",
+    "postbuild": "node scripts/prerender.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "engines": {
+    "node": ">=18 <=22"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.5",
+    "serve": "^14.2.5"
   },
   "eslintConfig": {
     "extends": [

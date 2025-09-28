@@ -246,7 +246,7 @@ const ContentTabs = () => {
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Stay informed with live updates, verification reports, market insights, 
-            and fraud alerts from the cryptocurrency ecosystem.
+            and fraud alerts from the online platforms ecosystem.
           </p>
         </div>
 

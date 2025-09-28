@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { SITE_NAME, LOGO_SRC, LOGO_ALT } from '../../config/brand';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -18,6 +19,7 @@ const Navbar = () => {
     { name: 'Home', to: '/' },
     { name: 'News', to: '/news' },
     { name: 'Platforms', to: '/platforms' },
+    { name: 'Verifications', to: '/verifications' },
     { name: 'Insights', to: '/insights' },
     { name: 'Exposure', to: '/exposure' }
   ];
@@ -33,14 +35,18 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <i className="fas fa-shield-check text-white text-sm"></i>
-            </div>
+            {LOGO_SRC ? (
+              <img src={LOGO_SRC} alt={LOGO_ALT} className="w-8 h-8 rounded-lg object-contain bg-white/0" />
+            ) : (
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <i className="fas fa-shield-check text-white text-sm"></i>
+              </div>
+            )}
             <Link
               to="/"
               className={`text-xl font-bold transition-colors duration-300 ${isScrolled ? 'text-gray-900' : 'text-white'}`}
             >
-              CryptoVerify
+              {SITE_NAME}
             </Link>
           </div>
 
@@ -58,9 +64,15 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-lg hover:scale-105">
+            <Link
+              to="/submit"
+              className={`relative text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md shadow-blue-500/30 ring-1 ring-blue-300/40 hover:shadow-lg hover:scale-105 ${
+                location.pathname === '/submit' ? 'ring-2 ring-offset-2 ring-offset-white' : ''
+              }`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               Submit Platform
-            </button>
+            </Link>
           </div>
 
           {/* Mobile toggle */}
@@ -94,9 +106,15 @@ const Navbar = () => {
                   {item.name}
                 </Link>
               ))}
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 mt-2">
+              <Link
+                to="/submit"
+                className={`block text-center w-full text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md shadow-blue-500/30 ring-1 ring-blue-300/40 ${
+                  location.pathname === '/submit' ? 'ring-2' : ''
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 Submit Platform
-              </button>
+              </Link>
             </div>
           </div>
         )}

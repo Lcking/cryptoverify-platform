@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PageLayout from '../layout/PageLayout';
+import Breadcrumbs from '../ui/Breadcrumbs';
+import { Link } from 'react-router-dom';
 import MasonryLayout from '../ui/MasonryLayout';
 
 const PlatformsPage = () => {
@@ -10,11 +12,11 @@ const PlatformsPage = () => {
 
   // 增加可选 logo 字段
   const data = [
-    { id: 1, name: 'Binance', score: 9.8, business: 'Global Exchange', summary: 'Largest by volume with wide derivatives products.', pairs: 1400, volume: '$15.2B', established: 2017, logo: 'https://via.placeholder.com/64x64/f3b322/ffffff?text=BN' },
-    { id: 2, name: 'Coinbase Pro', score: 9.5, business: 'Regulated Exchange', summary: 'US regulated, strong compliance & custody.', pairs: 250, volume: '$2.8B', established: 2012, logo: 'https://via.placeholder.com/64x64/0052ff/ffffff?text=CB' },
-    { id: 3, name: 'Kraken', score: 9.3, business: 'Professional Exchange', summary: 'Advanced features & security reputation.', pairs: 400, volume: '$1.2B', established: 2011, logo: 'https://via.placeholder.com/64x64/5741d9/ffffff?text=KR' },
-    { id: 4, name: 'Huobi', score: 8.7, business: 'Global Digital Asset', summary: 'Wide altcoin support & derivatives.', pairs: 600, volume: '$800M', established: 2013 },
-    { id: 5, name: 'KuCoin', score: 8.4, business: 'Altcoin Exchange', summary: 'Known for emerging token listings.', pairs: 700, volume: '$600M', established: 2017 }
+    { id: 1, slug: 'binance', name: 'Binance', score: 9.8, business: 'Global Exchange', summary: 'Largest by volume with wide derivatives products.', pairs: 1400, volume: '$15.2B', established: 2017, logo: 'https://via.placeholder.com/64x64/f3b322/ffffff?text=BN' },
+    { id: 2, slug: 'coinbase-pro', name: 'Coinbase Pro', score: 9.5, business: 'Regulated Exchange', summary: 'US regulated, strong compliance & custody.', pairs: 250, volume: '$2.8B', established: 2012, logo: 'https://via.placeholder.com/64x64/0052ff/ffffff?text=CB' },
+    { id: 3, slug: 'kraken', name: 'Kraken', score: 9.3, business: 'Professional Exchange', summary: 'Advanced features & security reputation.', pairs: 400, volume: '$1.2B', established: 2011, logo: 'https://via.placeholder.com/64x64/5741d9/ffffff?text=KR' },
+    { id: 4, slug: 'huobi', name: 'Huobi', score: 8.7, business: 'Global Digital Asset', summary: 'Wide altcoin support & derivatives.', pairs: 600, volume: '$800M', established: 2013 },
+    { id: 5, slug: 'kucoin', name: 'KuCoin', score: 8.4, business: 'Altcoin Exchange', summary: 'Known for emerging token listings.', pairs: 700, volume: '$600M', established: 2017 }
   ];
 
   useEffect(() => {
@@ -63,7 +65,9 @@ const PlatformsPage = () => {
       {/* 头部：左侧名称+logo，右侧评分 */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">{p.name}</h2>
+          <Link to={`/platforms/${p.slug}`} className="text-lg font-semibold text-gray-900 hover:text-blue-600">
+            {p.name}
+          </Link>
           <div className="mt-2">
             <Logo src={p.logo} alt={`${p.name} logo`} />
           </div>
@@ -91,7 +95,7 @@ const PlatformsPage = () => {
 
       <div className="flex justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
         <span><i className="fas fa-shield-alt text-blue-500 mr-1"></i>Verified</span>
-        <button className="text-blue-600 hover:underline font-medium">Details →</button>
+        <Link to={`/platforms/${p.slug}`} className="text-blue-600 hover:underline font-medium">Details →</Link>
       </div>
     </article>
   );
@@ -100,6 +104,7 @@ const PlatformsPage = () => {
     <PageLayout title="Cryptocurrency Platforms" description="Directory of major exchanges ranked by composite trust and operational metrics.">
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Platforms' }]} className="mb-6" />
           <MasonryLayout
             items={platforms}
             renderItem={renderPlatform}

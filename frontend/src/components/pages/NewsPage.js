@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import PageLayout from '../layout/PageLayout';
+import Breadcrumbs from '../ui/Breadcrumbs';
+import { Link } from 'react-router-dom';
+import { news as sharedNews } from '../../data/mock';
 import MasonryLayout from '../ui/MasonryLayout';
 
 const NewsPage = () => {
@@ -8,14 +11,7 @@ const NewsPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
 
-  const mock = Array.from({ length: 6 }).map((_, i) => ({
-    id: i + 1,
-    title: `Market Update #${i + 1}`,
-    content: 'Concise crypto market update summary describing key movements and sentiment shifts across major assets.',
-    source: 'CryptoWire',
-    timestamp: new Date(Date.now() - i * 3600 * 1000).toISOString(),
-    tags: ['Bitcoin', 'Volatility', 'Macro']
-  }));
+  const mock = sharedNews;
 
   useEffect(() => {
     if (items.length === 0) {
@@ -42,12 +38,12 @@ const NewsPage = () => {
         <span>{new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         <span className="flex items-center"><i className="fas fa-newspaper mr-1 text-blue-500"></i>{n.source}</span>
       </div>
-      <h2 className="text-lg font-semibold mb-2 text-gray-900 leading-snug">{n.title}</h2>
+  <Link to={`/news/${n.slug}`} className="text-lg font-semibold mb-2 text-gray-900 leading-snug hover:text-blue-600 block">{n.title}</Link>
       <p className="text-gray-600 text-sm mb-4 leading-relaxed">{n.content}</p>
       <div className="flex flex-wrap gap-2 mb-2">
         {n.tags.map(t => <span key={t} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">#{t}</span>)}
       </div>
-      <button className="text-blue-600 text-sm font-medium hover:underline">Read More →</button>
+  <Link to={`/news/${n.slug}`} className="text-blue-600 text-sm font-medium hover:underline">Read More →</Link>
     </article>
   );
 
@@ -55,6 +51,7 @@ const NewsPage = () => {
     <PageLayout title="24/7 Live Crypto News" description="Real-time market intelligence and concise crypto asset developments.">
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'News' }]} className="mb-6" />
           <MasonryLayout
             items={items}
             renderItem={renderItem}

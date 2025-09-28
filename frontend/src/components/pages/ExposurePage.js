@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import PageLayout from '../layout/PageLayout';
+import Breadcrumbs from '../ui/Breadcrumbs';
 import MasonryLayout from '../ui/MasonryLayout';
+import { exposureReports as exposureMock } from '../../data/mock';
 
 /**
  * ExposurePage
@@ -16,93 +19,7 @@ const ExposurePage = () => {
   const [severityFilter, setSeverityFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
 
-  const mockExposureData = [
-    {
-      id: 1,
-      platform: 'QuickTrade24',
-      type: 'Fake License',
-      severity: 'High',
-      status: 'Warning Issued',
-      reportedDate: '2024-01-14T09:10:00Z',
-      summary: 'Operating without a valid regulatory license while claiming FCA approval. Multiple user withdrawal delays reported.',
-      evidence: [
-        'Screenshots of falsified license number',
-        'User complaints about frozen funds',
-        'Mismatch between claimed address and registry records'
-      ],
-      riskFactors: ['License Forgery', 'Withdrawal Delay', 'False Address'],
-      reporterCount: 18,
-      lastUpdate: '2024-01-15T08:00:00Z'
-    },
-    {
-      id: 2,
-      platform: 'PrimeFX Option',
-      type: 'Ponzi Scheme',
-      severity: 'Critical',
-      status: 'Confirmed Fraud',
-      reportedDate: '2024-01-10T15:25:00Z',
-      summary: 'Unsustainable daily return promises (6–10%) with referral multi-level tree and blocked withdrawals after “upgrade fee” prompts.',
-      evidence: [
-        'Smart contract shows fund recycling pattern',
-        'On-chain analysis of large internal transfers',
-        'Refused third-party code audit'
-      ],
-      riskFactors: ['Unrealistic ROI', 'Referral Pyramid', 'Contract Obfuscation'],
-      reporterCount: 52,
-      lastUpdate: '2024-01-15T07:30:00Z'
-    },
-    {
-      id: 3,
-      platform: 'SafeCoin Earn',
-      type: 'Exit Scam',
-      severity: 'Critical',
-      status: 'Investigating',
-      reportedDate: '2024-01-12T11:40:00Z',
-      summary: 'Staking pool drained to anonymous wallets. Social media channels deleted within 30 minutes of fund movement.',
-      evidence: [
-        'Tx hash cluster to mixers',
-        'Deleted official Twitter & Telegram',
-        'Frontend now serving 404 after redirect'
-      ],
-      riskFactors: ['Liquidity Drain', 'Social Silence', 'Mixer Routing'],
-      reporterCount: 34,
-      lastUpdate: '2024-01-15T05:10:00Z'
-    },
-    {
-      id: 4,
-      platform: 'BitMeta Global',
-      type: 'Data Manipulation',
-      severity: 'Medium',
-      status: 'Warning Issued',
-      reportedDate: '2024-01-13T13:15:00Z',
-      summary: 'Reported artificial volume inflation (wash trading patterns) and inconsistent API orderbook depth snapshots.',
-      evidence: [
-        'Orderbook identical snapshots across 2h',
-        'Self-trade loops flagged by pattern detection',
-        'External aggregator mismatch (‑78%)'
-      ],
-      riskFactors: ['Wash Trading', 'API Inconsistency'],
-      reporterCount: 11,
-      lastUpdate: '2024-01-15T04:05:00Z'
-    },
-    {
-      id: 5,
-      platform: 'AlphaNode Vault',
-      type: 'Locked Funds',
-      severity: 'High',
-      status: 'User Reports Rising',
-      reportedDate: '2024-01-11T10:00:00Z',
-      summary: 'Users cannot unlock staked assets after lock period. Support only replies with automated messages demanding KYC resubmission.',
-      evidence: [
-        'Batch of support ticket screenshots',
-        'Contract shows modified lock variable',
-        'Hash of updated proxy implementation'
-      ],
-      riskFactors: ['Forced Retention', 'Proxy Upgrade Risk'],
-      reporterCount: 21,
-      lastUpdate: '2024-01-14T18:30:00Z'
-    }
-  ];
+  const mockExposureData = exposureMock;
 
   // Initial load
   useEffect(() => {
@@ -172,7 +89,7 @@ const ExposurePage = () => {
   };
 
   const renderReport = (r) => (
-    <article className={`bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border-l-4 ${
+    <Link to={`/exposure/${r.slug}`} className={`block bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border-l-4 ${
       r.severity === 'Critical' ? 'border-red-500' : r.severity === 'High' ? 'border-orange-500' : 'border-yellow-400'
     }`}>
       <div className="flex items-start justify-between mb-4">
@@ -211,18 +128,19 @@ const ExposurePage = () => {
 
       <div className="flex items-center justify-between pt-3 border-t border-gray-100 text-xs text-gray-600">
         <span className="flex items-center"><i className="fas fa-user-shield mr-1 text-blue-500"></i>{r.reporterCount} reporters</span>
-        <button className="text-blue-600 hover:text-blue-700 font-medium">View Details →</button>
+        <span className="text-blue-600 hover:text-blue-700 font-medium">View Details →</span>
       </div>
-    </article>
+    </Link>
   );
 
   const pageTitle = 'Fraud Exposure & Risk Alerts';
-  const pageDescription = 'Verified community and analytic reports exposing fraudulent or high-risk cryptocurrency platforms with evidence.';
+  const pageDescription = 'Verified community and analytic reports exposing fraudulent or high-risk online platforms with evidence.';
 
   return (
     <PageLayout title={pageTitle} description={pageDescription}>
       <section className="py-8 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Exposure' }]} className="mb-4" />
           <div className="flex flex-wrap items-center gap-4 justify-between">
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center space-x-2">
