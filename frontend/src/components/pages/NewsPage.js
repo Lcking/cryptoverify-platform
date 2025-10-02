@@ -3,7 +3,9 @@ import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import { Link } from 'react-router-dom';
 import { news as sharedNews } from '../../data/mock';
+import { fetchNews } from '../../lib/cmsClient';
 import MasonryLayout from '../ui/MasonryLayout';
+import siteContent from '../../config/siteContent';
 
 const NewsPage = () => {
   const [items, setItems] = useState([]);
@@ -14,14 +16,47 @@ const NewsPage = () => {
   const mock = sharedNews;
 
   useEffect(() => {
-    if (items.length === 0) {
+    let mounted = true;
+    async function load(pageNum = 1) {
       setLoading(true);
-      setTimeout(() => { setItems(mock); setLoading(false); }, 400);
+      try {
+        const res = await fetchNews({ page: pageNum, pageSize: 20 });
+        if (!mounted) return;
+        if (res?.data?.length) {
+          // Strapi v4 shape: { data: [{ id, attributes: { title, slug, ... }}] }
+          const mapped = res.data.map(d => ({
+            id: d.id,
+            slug: d.attributes?.slug,
+            title: d.attributes?.title,
+            content: d.attributes?.content || d.attributes?.excerpt || '',
+            source: d.attributes?.source || 'News',
+            timestamp: d.attributes?.timestamp || d.attributes?.publishedAt || new Date().toISOString(),
+            tags: d.attributes?.tags || []
+          }));
+          setItems(mapped);
+          const pg = res.meta?.pagination || { page: 1, pageCount: 1 };
+          setHasMore(pg.page < pg.pageCount);
+        } else {
+          // Fallback to mock
+          setItems(mock);
+          setHasMore(false);
+        }
+      } catch (_) {
+        setItems(mock);
+        setHasMore(false);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     }
+    if (items.length === 0) {
+      load(1);
+    }
+    return () => { mounted = false; };
   }, []); // eslint-disable-line
 
   const loadMore = () => {
-    if (loading) return;
+    if (loading || !hasMore) return;
+    // If CMS connected, you'd call fetchNews for next page. For now, we simply stop or extend mock.
     setLoading(true);
     setTimeout(() => {
       const extra = mock.map(n => ({ ...n, id: n.id + page * 100, title: n.title + ' (Ext)' }));
@@ -48,7 +83,11 @@ const NewsPage = () => {
   );
 
   return (
-    <PageLayout title="24/7 Live Crypto News" description="Real-time market intelligence and concise crypto asset developments.">
+    <PageLayout
+      title={siteContent.pages?.news?.title}
+      description={siteContent.pages?.news?.description}
+      seo={siteContent.pages?.news?.seo}
+    >
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'News' }]} className="mb-6" />

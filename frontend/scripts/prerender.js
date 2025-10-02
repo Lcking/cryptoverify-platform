@@ -1,6 +1,6 @@
 /*
-  Simple prerender for CRA using react-dom/server + StaticRouter
-  - Renders selected routes into build/*.html
+  Simple prerender for CRA
+  - Injects route-specific SEO meta into build/*.html (title/description/keywords + OG/Twitter)
   - Generates sitemap.xml
 */
 
@@ -15,46 +15,104 @@ const buildDir = path.resolve(__dirname, '..', 'build');
 const indexHtmlPath = path.join(buildDir, 'index.html');
 const indexTemplate = fs.readFileSync(indexHtmlPath, 'utf8');
 
-// Import App from the built source via require-from-root src (using transpiled code is tricky).
-// Here we instead render minimal shell HTML per route with key content placeholders you can enhance later.
-// For SEO boost, we pre-inject simple route-specific title/description and a noscript SSR-like snippet.
+// For SEO boost, we pre-inject route-specific title/description/keywords and a noscript block.
+
+// Load siteContent (ES module-like) by transforming to CommonJS at runtime
+function loadSiteContent() {
+  try {
+    const siteContentPath = path.resolve(__dirname, '..', 'src', 'config', 'siteContent.js');
+    const code = fs.readFileSync(siteContentPath, 'utf8');
+    // Replace export default with module.exports =
+    const cjsCode = code.replace(/export\s+default\s+siteContent\s*;?/g, 'module.exports = siteContent;');
+    const tmpPath = path.join(__dirname, '.siteContent.tmp.cjs');
+    fs.writeFileSync(tmpPath, cjsCode, 'utf8');
+    const content = require(tmpPath);
+    fs.unlinkSync(tmpPath);
+    return content;
+  } catch (e) {
+    console.warn('Warning: failed to load siteContent.js for prerender SEO:', e.message);
+    return null;
+  }
+}
+
+const sc = loadSiteContent();
+
+function pickSeo(pageKey, fallback) {
+  const page = sc?.pages?.[pageKey];
+  const seo = page?.seo || {};
+  return {
+    title: seo.title || page?.title || fallback.title,
+    description: seo.description || page?.description || fallback.description,
+    keywords: seo.keywords || ''
+  };
+}
 
 const routes = [
-  { path: '/', title: 'Crypto Verify Platform', description: 'Real-time news, platform verification, insights and exposure.' },
-  { path: '/news', title: 'Live News', description: 'Latest updates and headlines around the clock.' },
-  { path: '/platforms', title: 'Platforms Directory', description: 'Directory of major platforms ranked by trust and metrics.' },
-  { path: '/verifications', title: 'Verifications', description: 'Published verification records with operation checks and evidence.' },
-  { path: '/insights', title: 'Insights & Research', description: 'Deep dives, market insights, and analysis.' },
-  { path: '/exposure', title: 'Fraud Exposure', description: 'Community reports and exposure of risky projects/platforms.' },
-  { path: '/submit', title: 'Submit Platform', description: 'Submit a platform to verify or report suspicious activity.' }
+  { path: '/', ...pickSeo('home', { title: 'Home', description: 'Home' }) },
+  { path: '/news', ...pickSeo('news', { title: 'News', description: 'Latest updates and headlines around the clock.' }) },
+  { path: '/platforms', ...pickSeo('platforms', { title: 'Platforms Directory', description: 'Directory of major platforms ranked by trust and metrics.' }) },
+  { path: '/verifications', ...pickSeo('verifications', { title: 'Verifications', description: 'Published verification records with operation checks and evidence.' }) },
+  { path: '/insights', ...pickSeo('insights', { title: 'Insights & Research', description: 'Deep dives, market insights, and analysis.' }) },
+  { path: '/exposure', ...pickSeo('exposure', { title: 'Fraud Exposure', description: 'Community reports and exposure of risky projects/platforms.' }) },
+  { path: '/submit', ...pickSeo('submit', { title: 'Submit Platform', description: 'Submit a platform to verify or report suspicious activity.' }) },
+  { path: '/search', ...pickSeo('search', { title: 'Search', description: 'Search across the site.' }) }
 ];
 
 // Build detail routes dynamically using content snapshots
 const content = require('./content');
 
-const staticDetailRoutes = [
-  { path: '/platforms/binance', title: 'Binance - Platform Profile', description: 'Largest exchange by volume with derivatives products.' },
-  { path: '/platforms/coinbase-pro', title: 'Coinbase Pro - Platform Profile', description: 'US regulated exchange with strong compliance.' },
-  { path: '/platforms/kraken', title: 'Kraken - Platform Profile', description: 'Professional exchange with security reputation.' },
-  { path: '/news/market-update-1', title: 'Market Update #1', description: 'Concise market update summary and key movements.' },
-  { path: '/verifications/binance-2025-09-10', title: 'Verification - Binance (Sept 10, 2025)', description: 'Live trading and withdrawal check.' }
-];
+const platformDetailRoutes = (content.platforms || []).map(p => ({
+  path: `/platforms/${p.slug}`,
+  title: `${p.name} - Platform Profile`,
+  description: p.summary || 'Platform profile overview.',
+  keywords: `${p.name}, platform profile, security, verification`
+}));
 
-const insightDetailRoutes = content.insights.map(i => ({
+const newsDetailRoutes = (content.news || []).map(n => ({
+  path: `/news/${n.slug}`,
+  title: n.title,
+  description: n.excerpt || 'News update.',
+  keywords: `news, update, ${n.slug}`
+}));
+
+const verificationDetailRoutes = (content.verifications || []).map(v => ({
+  path: `/verifications/${v.slug}`,
+  title: `Verification - ${v.platform}`,
+  description: v.title || 'Verification record.',
+  keywords: `${v.platform}, verification, audit`
+}));
+
+const insightDetailRoutes = (content.insights || []).map(i => ({
   path: `/insights/${i.slug}`,
   title: i.title,
-  description: i.excerpt || 'Insight article.'
+  description: i.excerpt || 'Insight article.',
+  keywords: `insight, research, ${i.slug}`
 }));
 
-const exposureDetailRoutes = content.exposureReports.map(r => ({
+const exposureDetailRoutes = (content.exposureReports || []).map(r => ({
   path: `/exposure/${r.slug}`,
   title: `${r.platform} — ${r.type}`,
-  description: r.summary || 'Exposure report.'
+  description: r.summary || 'Exposure report.',
+  keywords: `exposure, ${r.platform}, ${r.type}`
 }));
 
-const detailRoutes = [...staticDetailRoutes, ...insightDetailRoutes, ...exposureDetailRoutes];
+const detailRoutes = [
+  ...platformDetailRoutes,
+  ...newsDetailRoutes,
+  ...verificationDetailRoutes,
+  ...insightDetailRoutes,
+  ...exposureDetailRoutes
+];
 
-function injectMeta(html, { title, description }) {
+// Deduplicate by path in case of overlaps
+const seen = new Set();
+const dedupedDetailRoutes = detailRoutes.filter(r => {
+  if (seen.has(r.path)) return false;
+  seen.add(r.path);
+  return true;
+});
+
+function injectMeta(html, { title, description, keywords }) {
   let out = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
 
   const descMetaRe = /<meta\s+name="description"\s+content=".*?"\s*\/>/i;
@@ -62,6 +120,15 @@ function injectMeta(html, { title, description }) {
     out = out.replace(descMetaRe, `<meta name="description" content="${description}"/>`);
   } else {
     out = out.replace('</head>', `  <meta name="description" content="${description}"/>\n</head>`);
+  }
+
+  if (keywords) {
+    const kwRe = /<meta\s+name="keywords"\s+content=".*?"\s*\/>/i;
+    if (kwRe.test(out)) {
+      out = out.replace(kwRe, `<meta name="keywords" content="${keywords}"/>`);
+    } else {
+      out = out.replace('</head>', `  <meta name="keywords" content="${keywords}"/>\n</head>`);
+    }
   }
 
   const ogTitleRe = /<meta\s+property="og:title"\s+content=".*?"\s*\/>/i;
@@ -106,7 +173,7 @@ function buildNoscriptContent(route) {
 }
 
 function renderRouteToHtml(route) {
-  const tpl = injectMeta(indexTemplate, { title: route.title, description: route.description });
+  const tpl = injectMeta(indexTemplate, { title: route.title, description: route.description, keywords: route.keywords });
   const noscript = buildNoscriptContent(route.path);
   // Inject noscript right after opening body tag
   const html = tpl.replace('<body>', `<body>\n${noscript}`);
@@ -128,7 +195,7 @@ function generateSitemap(baseUrl, routes) {
 (function main() {
   try {
     // Write route-specific html
-    [...routes, ...detailRoutes].forEach(r => {
+    [...routes, ...dedupedDetailRoutes].forEach(r => {
       const html = renderRouteToHtml(r);
       const outFile = routeToFilename(r.path);
       writeFileSafe(outFile, html);
@@ -137,7 +204,7 @@ function generateSitemap(baseUrl, routes) {
 
     // Write sitemap.xml
     const baseUrl = process.env.SITE_URL || 'https://example.com';
-  const sitemap = generateSitemap(baseUrl, [...routes, ...detailRoutes]);
+  const sitemap = generateSitemap(baseUrl, [...routes, ...dedupedDetailRoutes]);
     fs.writeFileSync(path.join(buildDir, 'sitemap.xml'), sitemap);
     console.log('Generated sitemap.xml');
   } catch (e) {

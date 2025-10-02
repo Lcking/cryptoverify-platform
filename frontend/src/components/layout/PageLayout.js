@@ -2,10 +2,14 @@ import React from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import FloatingContacts from '../ui/FloatingContacts';
+import Seo from '../seo/Seo';
 
-const PageLayout = ({ children, title, description }) => {
+const PageLayout = ({ children, title, description, seo }) => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      {seo && (
+        <Seo title={seo.title || title} description={seo.description || description} keywords={seo.keywords} />
+      )}
       <Navbar />
       {(title || description) && (
         <header className="bg-gradient-to-r from-blue-600 to-blue-700 pt-20 pb-12 text-center text-white px-4">

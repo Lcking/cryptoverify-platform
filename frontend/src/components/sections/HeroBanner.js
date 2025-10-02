@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
 import { TAGLINE_LINE1, TAGLINE_LINE2, HERO_SUBTEXT } from '../../config/brand';
+import siteContent from '../../config/siteContent';
 
 const HeroBanner = () => {
   const [searchQuery, setSearchQuery] = useState('');
   
-  const hotSearches = [
-    'Binance',
-    'Coinbase',
-    'Kraken',
-    'Huobi',
-    'KuCoin'
-  ];
+  const hotSearches = siteContent.hero?.hotSearches || ['Binance', 'Coinbase', 'Kraken', 'Huobi', 'KuCoin'];
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -93,18 +88,12 @@ const HeroBanner = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto mt-16">
-          <div className="text-center">
-            <div className="text-3xl font-bold mb-2">500+</div>
-            <div className="text-blue-200 text-sm">Verified Entries</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold mb-2">24/7</div>
-            <div className="text-blue-200 text-sm">Monitoring Service</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold mb-2">99.9%</div>
-            <div className="text-blue-200 text-sm">Accuracy Rate</div>
-          </div>
+          {(siteContent.hero?.stats || []).map((s, idx) => (
+            <div key={idx} className="text-center">
+              <div className="text-3xl font-bold mb-2">{s.value}</div>
+              <div className="text-blue-200 text-sm">{s.label}</div>
+            </div>
+          ))}
         </div>
       </div>
 

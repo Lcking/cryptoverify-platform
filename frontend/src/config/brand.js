@@ -1,14 +1,11 @@
-// Centralized brand configuration
-// Replace values below to customize site branding without touching components.
+// Centralized brand configuration (proxy to siteContent)
+import siteContent from './siteContent';
 
-export const SITE_NAME = 'GambleVerify';
-
-// Put your logo file into /public and set the path here, e.g. '/logo.svg' or '/logo.png'.
-// Leave empty string ('') to use the default icon fallback.
-export const LOGO_SRC = '';
-export const LOGO_ALT = 'Site Logo';
+export const SITE_NAME = siteContent.brand?.siteName || 'CryptoVerify';
+export const LOGO_SRC = siteContent.brand?.logo?.src || '';
+export const LOGO_ALT = siteContent.brand?.logo?.alt || 'Site Logo';
 
 // Hero texts
-export const TAGLINE_LINE1 = 'Verify Gamble Platforms';
-export const TAGLINE_LINE2 = 'With Confidence';
-export const HERO_SUBTEXT = 'Professional verification service for Gambling platforms. Get real-time authenticity checks, security reviews, and fraud alerts.';
+export const TAGLINE_LINE1 = siteContent.hero?.line1 || 'Verify Platforms';
+export const TAGLINE_LINE2 = siteContent.hero?.line2 || 'With Confidence';
+export const HERO_SUBTEXT = siteContent.hero?.subtext || 'Professional verification service for online platforms.';

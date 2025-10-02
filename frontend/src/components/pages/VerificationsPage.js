@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import { verifications, platforms } from '../../data/mock';
+import siteContent from '../../config/siteContent';
 import { Link } from 'react-router-dom';
 
 const VerificationsPage = () => {
@@ -13,11 +14,11 @@ const VerificationsPage = () => {
     return list.filter(v => v.platformSlug === filter);
   }, [filter]);
 
-  const title = 'Verifications';
-  const desc = 'Published verification records by editors with operation evidence and checks.';
+  const title = siteContent.pages?.verifications?.title || 'Verifications';
+  const desc = siteContent.pages?.verifications?.description || 'Published verification records by editors with operation evidence and checks.';
 
   return (
-    <PageLayout title={title} description={desc}>
+    <PageLayout title={title} description={desc} seo={siteContent.pages?.verifications?.seo}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
         <Breadcrumbs
           items={[

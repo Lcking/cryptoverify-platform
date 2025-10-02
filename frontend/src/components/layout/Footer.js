@@ -1,40 +1,11 @@
 import React from 'react';
+import siteContent from '../../config/siteContent';
 
 const Footer = () => {
-  const footerLinks = {
-    'Platform': [
-      { name: 'Directory', href: '#platforms' },
-      { name: 'Verification Process', href: '#verification' },
-      { name: 'Security Standards', href: '#security' },
-      { name: 'API Access', href: '#api' }
-    ],
-    'Resources': [
-      { name: 'Blog', href: '#blog' },
-      { name: 'Research', href: '#research' },
-      { name: 'Documentation', href: '#docs' },
-      { name: 'Help Center', href: '#help' }
-    ],
-    'Company': [
-      { name: 'About Us', href: '#about' },
-      { name: 'Careers', href: '#careers' },
-      { name: 'Press', href: '#press' },
-      { name: 'Contact', href: '#contact' }
-    ],
-    'Legal': [
-      { name: 'Privacy Policy', href: '#privacy' },
-      { name: 'Terms of Service', href: '#terms' },
-      { name: 'Cookie Policy', href: '#cookies' },
-      { name: 'Disclaimer', href: '#disclaimer' }
-    ]
-  };
-
-  const socialLinks = [
-    { name: 'Twitter', icon: 'fab fa-twitter', href: '#', color: 'hover:text-blue-400' },
-    { name: 'LinkedIn', icon: 'fab fa-linkedin', href: '#', color: 'hover:text-blue-600' },
-    { name: 'GitHub', icon: 'fab fa-github', href: '#', color: 'hover:text-gray-600' },
-    { name: 'Discord', icon: 'fab fa-discord', href: '#', color: 'hover:text-indigo-500' },
-    { name: 'Telegram', icon: 'fab fa-telegram', href: '#', color: 'hover:text-blue-500' }
-  ];
+  const footerLinks = siteContent.footer?.columns || {};
+  const socialLinks = siteContent.footer?.social || [];
+  const siteName = siteContent.brand?.siteName || 'CryptoVerify';
+  const badges = siteContent.footer?.badges || [];
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -77,7 +48,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <i className="fas fa-shield-check text-white text-sm"></i>
               </div>
-              <span className="text-xl font-bold">CryptoVerify</span>
+              <span className="text-xl font-bold">{siteName}</span>
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               Professional cryptocurrency platform verification service. 
@@ -126,22 +97,16 @@ const Footer = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-gray-400 text-sm mb-4 md:mb-0">
-              © 2024 CryptoVerify. All rights reserved. Built with security in mind.
+              {siteContent.footer?.copyright}
             </div>
             
             <div className="flex items-center space-x-6 text-sm text-gray-400">
-              <div className="flex items-center">
-                <i className="fas fa-shield-check text-green-500 mr-2"></i>
-                <span>SSL Secured</span>
-              </div>
-              <div className="flex items-center">
-                <i className="fas fa-clock text-blue-500 mr-2"></i>
-                <span>99.9% Uptime</span>
-              </div>
-              <div className="flex items-center">
-                <i className="fas fa-globe text-purple-500 mr-2"></i>
-                <span>50+ Countries</span>
-              </div>
+              {badges.map((b, i) => (
+                <div key={i} className="flex items-center">
+                  <i className={`${b.icon} mr-2`}></i>
+                  <span>{b.label}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

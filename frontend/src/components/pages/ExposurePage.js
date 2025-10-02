@@ -4,6 +4,7 @@ import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import MasonryLayout from '../ui/MasonryLayout';
 import { exposureReports as exposureMock } from '../../data/mock';
+import siteContent from '../../config/siteContent';
 
 /**
  * ExposurePage
@@ -133,11 +134,11 @@ const ExposurePage = () => {
     </Link>
   );
 
-  const pageTitle = 'Fraud Exposure & Risk Alerts';
-  const pageDescription = 'Verified community and analytic reports exposing fraudulent or high-risk online platforms with evidence.';
+  const pageTitle = siteContent.pages?.exposure?.title || 'Fraud Exposure & Risk Alerts';
+  const pageDescription = siteContent.pages?.exposure?.description || 'Verified community and analytic reports exposing fraudulent or high-risk online platforms with evidence.';
 
   return (
-    <PageLayout title={pageTitle} description={pageDescription}>
+    <PageLayout title={pageTitle} description={pageDescription} seo={siteContent.pages?.exposure?.seo}>
       <section className="py-8 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Exposure' }]} className="mb-4" />

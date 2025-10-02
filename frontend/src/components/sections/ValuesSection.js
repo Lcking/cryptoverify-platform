@@ -1,4 +1,5 @@
 import React from 'react';
+import siteContent from '../../config/siteContent';
 
 const ValuesSection = () => {
   const values = [
@@ -24,38 +25,7 @@ const ValuesSection = () => {
     }
   ];
 
-  const partners = [
-    {
-      name: 'CoinDesk',
-      type: 'Media Partner',
-      logo: 'https://via.placeholder.com/120x60/e5e7eb/6b7280?text=CoinDesk'
-    },
-    {
-      name: 'CoinTelegraph',
-      type: 'News Partner',
-      logo: 'https://via.placeholder.com/120x60/e5e7eb/6b7280?text=Cointelegraph'
-    },
-    {
-      name: 'Blockchain.com',
-      type: 'Technology Partner',
-      logo: 'https://via.placeholder.com/120x60/e5e7eb/6b7280?text=Blockchain'
-    },
-    {
-      name: 'CryptoCompare',
-      type: 'Data Partner',
-      logo: 'https://via.placeholder.com/120x60/e5e7eb/6b7280?text=CryptoCompare'
-    },
-    {
-      name: 'ConsenSys',
-      type: 'Security Partner',
-      logo: 'https://via.placeholder.com/120x60/e5e7eb/6b7280?text=ConsenSys'
-    },
-    {
-      name: 'ChainAnalysis',
-      type: 'Analytics Partner',
-      logo: 'https://via.placeholder.com/120x60/e5e7eb/6b7280?text=Chainalysis'
-    }
-  ];
+  const partners = siteContent?.partners?.items || [];
 
   const stats = [
     {
@@ -172,9 +142,14 @@ const ValuesSection = () => {
                 <h4 className="font-semibold text-gray-900 text-sm mb-1">
                   {partner.name}
                 </h4>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 mb-1">
                   {partner.type}
                 </p>
+                {partner.description && (
+                  <p className="text-xs text-gray-400 line-clamp-2">
+                    {partner.description}
+                  </p>
+                )}
               </div>
             ))}
           </div>

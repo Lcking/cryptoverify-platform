@@ -2,6 +2,27 @@
 // Keep in sync with src/data/mock.js where possible
 
 module.exports = {
+  // Minimal platform snapshots for detail SEO
+  platforms: [
+    { slug: 'binance', name: 'Binance', summary: 'Largest by volume with wide derivatives products.' },
+    { slug: 'coinbase-pro', name: 'Coinbase Pro', summary: 'US regulated, strong compliance & custody.' },
+    { slug: 'kraken', name: 'Kraken', summary: 'Advanced features & security reputation.' }
+  ],
+
+  // Minimal news snapshots for detail SEO
+  news: [
+    { slug: 'market-update-1', title: 'Market Update #1', excerpt: 'Concise market update summary describing key movements.' },
+    { slug: 'market-update-2', title: 'Market Update #2', excerpt: 'Hourly recap of volatility and flows.' },
+    { slug: 'market-update-3', title: 'Market Update #3', excerpt: 'Key headlines impacting major assets.' }
+  ],
+
+  // Minimal verification snapshots for detail SEO
+  verifications: [
+    { slug: 'binance-2025-09-10', platform: 'Binance', title: 'Live trading and withdrawal check (Sept 10, 2025)' },
+    { slug: 'coinbase-pro-2025-09-05', platform: 'Coinbase Pro', title: 'Bank transfer in/out & fee audit (Sept 5, 2025)' },
+    { slug: 'kraken-2025-09-12', platform: 'Kraken', title: 'Spot & futures liquidity sampling (Sept 12, 2025)' }
+  ],
+
   insights: [
     { slug: 'layer-2-scaling-outlook', title: 'Layer 2 Scaling Outlook', excerpt: 'How rollups and zk proofs shape performance trajectory.', author: 'Research Desk', timestamp: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), read: '7 min' },
     { slug: 'institutional-adoption-curve', title: 'Institutional Adoption Curve', excerpt: 'Tracking custody growth and flows as rails mature.', author: 'Market Analytics', timestamp: new Date(Date.now() - 6 * 3600 * 1000).toISOString(), read: '6 min' },

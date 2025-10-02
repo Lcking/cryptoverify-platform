@@ -6,10 +6,17 @@ import FeaturesSection from './sections/FeaturesSection';
 import ContentTabs from './sections/ContentTabs';
 import ValuesSection from './sections/ValuesSection';
 import FloatingContacts from './ui/FloatingContacts';
+import Seo from './seo/Seo';
+import siteContent from '../config/siteContent';
 
 const HomePage = () => {
   return (
     <div className="min-h-screen bg-white">
+      <Seo
+        title={siteContent.pages?.home?.seo?.title}
+        description={siteContent.pages?.home?.seo?.description}
+        keywords={siteContent.pages?.home?.seo?.keywords}
+      />
       {/* Navigation */}
       <Navbar />
       

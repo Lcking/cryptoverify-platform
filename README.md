@@ -134,11 +134,12 @@ This builds the app for production to the `build` folder.
 ## 📊 Future Enhancements
 
 ### Backend Integration
-- **FastAPI**: Python backend for API services
-- **SQLite/PostgreSQL**: Database for platform data
-- **Real-time APIs**: Integration with financial data providers
-- **Authentication**: User account management
-- **Admin Panel**: Content management system
+- 当前推荐：**Strapi** 作为 CMS 与 API 层（见下文“Backend Setup”）
+- 备选：**FastAPI**（Python）自定义 API 服务
+- 数据库：**SQLite/PostgreSQL**
+- 实时接口：对接行情与资讯提供商
+- 认证：用户账户与权限
+- 管理端：内容管理系统
 
 ### Content Management
 - **API Integration**: Eastern Fortune 7x24 news API
@@ -154,6 +155,14 @@ This builds the app for production to the `build` folder.
 - **Mobile Apps**: Native mobile applications
 
 ## 🔧 Development Guidelines
+
+## 🗄️ Backend Setup (Strapi)
+
+项目已对接 Strapi 的环境变量与 API 调用，建议使用 Strapi 作为后台：
+
+- 搭建步骤与对接说明请参考仓库根目录的《README-STRAPI.md》。
+- 本地开发默认前端从 `http://localhost:1337` 读取数据。
+- 复制 `frontend/.env.example` 为 `frontend/.env.local` 并调整 CMS 相关变量。
 
 ### Component Structure
 ```

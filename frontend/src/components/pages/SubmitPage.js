@@ -3,6 +3,7 @@ import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import { ENABLE_CMS, CMS_BASE_URL, CMS_SUBMISSIONS_API, CMS_API_TOKEN } from '../../config/cms';
 import { SUBMIT_MODE, GOOGLE_FORM_URL, FALLBACK_MAILTO, getGoogleFormEmbedUrl } from '../../config/submit';
+import siteContent from '../../config/siteContent';
 
 const initialState = {
   type: 'platform', // platform | exposure
@@ -84,11 +85,11 @@ const SubmitPage = () => {
     setLoading(false);
   };
 
-  const title = 'Submit a Platform or Exposure Report';
-  const description = 'Share a platform to verify or report a suspicious/fraudulent platform. Your submission helps the community.';
+  const title = siteContent.pages?.submit?.title || 'Submit a Platform or Exposure Report';
+  const description = siteContent.pages?.submit?.description || 'Share a platform to verify or report a suspicious/fraudulent platform. Your submission helps the community.';
 
   return (
-    <PageLayout title={title} description={description}>
+    <PageLayout title={title} description={description} seo={siteContent.pages?.submit?.seo}>
       <section className="py-12">
         <div className="max-w-2xl mx-auto px-4">
           <Breadcrumbs

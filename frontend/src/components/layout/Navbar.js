@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { SITE_NAME, LOGO_SRC, LOGO_ALT } from '../../config/brand';
+import siteContent from '../../config/siteContent';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,14 +16,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navItems = [
-    { name: 'Home', to: '/' },
-    { name: 'News', to: '/news' },
-    { name: 'Platforms', to: '/platforms' },
-    { name: 'Verifications', to: '/verifications' },
-    { name: 'Insights', to: '/insights' },
-    { name: 'Exposure', to: '/exposure' }
-  ];
+  const navItems = (siteContent.navigation?.primary || []).map(i => ({ name: i.label, to: i.to }));
 
   const linkBase = (scrolled) => scrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-300';
 
@@ -65,13 +59,13 @@ const Navbar = () => {
               </Link>
             ))}
             <Link
-              to="/submit"
+              to={siteContent.navigation?.cta?.to || '/submit'}
               className={`relative text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md shadow-blue-500/30 ring-1 ring-blue-300/40 hover:shadow-lg hover:scale-105 ${
-                location.pathname === '/submit' ? 'ring-2 ring-offset-2 ring-offset-white' : ''
+                location.pathname === (siteContent.navigation?.cta?.to || '/submit') ? 'ring-2 ring-offset-2 ring-offset-white' : ''
               }`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Submit Platform
+              {siteContent.navigation?.cta?.label || 'Submit Platform'}
             </Link>
           </div>
 
@@ -107,13 +101,13 @@ const Navbar = () => {
                 </Link>
               ))}
               <Link
-                to="/submit"
+                to={siteContent.navigation?.cta?.to || '/submit'}
                 className={`block text-center w-full text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md shadow-blue-500/30 ring-1 ring-blue-300/40 ${
-                  location.pathname === '/submit' ? 'ring-2' : ''
+                  location.pathname === (siteContent.navigation?.cta?.to || '/submit') ? 'ring-2' : ''
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Submit Platform
+                {siteContent.navigation?.cta?.label || 'Submit Platform'}
               </Link>
             </div>
           </div>

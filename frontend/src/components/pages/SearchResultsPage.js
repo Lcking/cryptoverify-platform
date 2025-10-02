@@ -4,6 +4,7 @@ import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import { platforms, news, insights, exposureReports, verifications } from '../../data/mock';
 import { searchAll } from '../../api/searchClient';
+import siteContent from '../../config/siteContent';
 
 function useQuery() {
   const { search } = useLocation();
@@ -51,11 +52,12 @@ const SearchResultsPage = () => {
 
   const total = platformHits.length + newsHits.length + insightsHits.length + exposureHits.length + verificationHits.length;
 
-  const title = 'Search Results';
-  const description = q ? `Results for "${rawQ}"` : 'Type a keyword to search across the site.';
+  const title = siteContent.pages?.search?.title || 'Search Results';
+  const descriptionBase = siteContent.pages?.search?.description || 'Type a keyword to search across the site.';
+  const description = q ? `Results for "${rawQ}"` : descriptionBase;
 
   return (
-    <PageLayout title={title} description={description}>
+  <PageLayout title={title} description={description} seo={siteContent.pages?.search?.seo}>
       <section className="py-10">
         <div className="max-w-6xl mx-auto px-4">
           <Breadcrumbs

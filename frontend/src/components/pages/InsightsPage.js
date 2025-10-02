@@ -4,6 +4,7 @@ import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import MasonryLayout from '../ui/MasonryLayout';
 import { insights } from '../../data/mock';
+import siteContent from '../../config/siteContent';
 
 const InsightsPage = () => {
   const articles = insights;
@@ -31,7 +32,11 @@ const InsightsPage = () => {
   );
 
   return (
-    <PageLayout title="Market Insights & Research" description="Analytical perspectives, structural metrics, and forward-looking market intelligence.">
+    <PageLayout
+      title={siteContent.pages?.insights?.title}
+      description={siteContent.pages?.insights?.description}
+      seo={siteContent.pages?.insights?.seo}
+    >
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Breadcrumbs

@@ -1,31 +1,10 @@
 import React, { useState } from 'react';
+import siteContent from '../../config/siteContent';
 
 const FloatingContacts = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const contactMethods = [
-    {
-      name: 'Telegram',
-      icon: 'fab fa-telegram-plane',
-      url: 'https://t.me/cryptoverify',
-      bgColor: 'bg-blue-500',
-      hoverColor: 'hover:bg-blue-600'
-    },
-    {
-      name: 'WhatsApp',
-      icon: 'fab fa-whatsapp',
-      url: 'https://wa.me/1234567890',
-      bgColor: 'bg-green-500',
-      hoverColor: 'hover:bg-green-600'
-    },
-    {
-      name: 'Discord',
-      icon: 'fab fa-discord',
-      url: 'https://discord.gg/cryptoverify',
-      bgColor: 'bg-indigo-600',
-      hoverColor: 'hover:bg-indigo-700'
-    }
-  ];
+  const contactMethods = siteContent.contacts || [];
 
   return (
     <div className="fixed right-6 bottom-6 z-50">

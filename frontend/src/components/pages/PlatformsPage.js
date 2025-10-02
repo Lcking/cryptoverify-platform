@@ -3,6 +3,7 @@ import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import { Link } from 'react-router-dom';
 import MasonryLayout from '../ui/MasonryLayout';
+import siteContent from '../../config/siteContent';
 
 const PlatformsPage = () => {
   const [platforms, setPlatforms] = useState([]);
@@ -101,7 +102,11 @@ const PlatformsPage = () => {
   );
 
   return (
-    <PageLayout title="Cryptocurrency Platforms" description="Directory of major exchanges ranked by composite trust and operational metrics.">
+    <PageLayout
+      title={siteContent.pages?.platforms?.title}
+      description={siteContent.pages?.platforms?.description}
+      seo={siteContent.pages?.platforms?.seo}
+    >
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Platforms' }]} className="mb-6" />
