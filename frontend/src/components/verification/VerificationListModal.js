@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-const VerificationListModal = ({ open, onClose, items = [], title = 'Verification Records' }) => {
+const VerificationListModal = ({ open, onClose, items = [], title = 'Verification Records', loading = false, hasMore = false, onLoadMore }) => {
   useEffect(() => {
     function onKey(e) { if (e.key === 'Escape') onClose?.(); }
     if (open) window.addEventListener('keydown', onKey);
@@ -42,6 +42,18 @@ const VerificationListModal = ({ open, onClose, items = [], title = 'Verificatio
               </ul>
             )}
           </div>
+          {(loading || hasMore) && (
+            <div className="p-4 border-t flex items-center justify-center">
+              {loading ? (
+                <div className="flex items-center space-x-3 text-gray-600">
+                  <div className="h-5 w-5 rounded-full border-2 border-blue-600 border-t-transparent animate-spin"></div>
+                  <span>Loading…</span>
+                </div>
+              ) : (
+                <button onClick={onLoadMore} className="px-4 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md">Load more</button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

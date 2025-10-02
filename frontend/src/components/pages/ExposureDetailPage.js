@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import { exposureReports } from '../../data/mock';
+import { ENABLE_CMS } from '../../config/cms';
+import { fetchExposureBySlug } from '../../lib/cmsClient';
 
 const badgeColor = (severity) => {
   switch (severity) {
@@ -19,7 +21,22 @@ const badgeColor = (severity) => {
 
 const ExposureDetailPage = () => {
   const { slug } = useParams();
-  const item = exposureReports.find(n => n.slug === slug);
+  const [item, setItem] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        if (ENABLE_CMS) {
+          const entity = await fetchExposureBySlug(slug);
+          if (!cancelled) setItem(entity);
+          return;
+        }
+      } catch (_) {}
+      setItem(exposureReports.find(n => n.slug === slug) || null);
+    })();
+    return () => { cancelled = true; };
+  }, [slug]);
 
   if (!item) {
     return (

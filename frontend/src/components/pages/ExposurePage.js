@@ -4,6 +4,8 @@ import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import MasonryLayout from '../ui/MasonryLayout';
 import { exposureReports as exposureMock } from '../../data/mock';
+import { ENABLE_CMS } from '../../config/cms';
+import { fetchExposures } from '../../lib/cmsClient';
 import siteContent from '../../config/siteContent';
 
 /**
@@ -28,8 +30,31 @@ const ExposurePage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [severityFilter, typeFilter]);
 
-  const loadInitialReports = () => {
+  const loadInitialReports = async () => {
     setLoading(true);
+    try {
+      if (ENABLE_CMS) {
+        const res = await fetchExposures({ page: 1, pageSize: 20 });
+        if (res?.data?.length) {
+          const items = res.data;
+          let data = items;
+          if (severityFilter !== 'all') data = data.filter(r => (r.severity || '').toLowerCase() === severityFilter);
+          if (typeFilter !== 'all') data = data.filter(r => (r.type || '').toLowerCase().includes(typeFilter));
+          const sevRank = { critical: 4, high: 3, medium: 2, low: 1 };
+          data.sort((a,b) => {
+            const s = (sevRank[(b.severity||'').toLowerCase()] || 0) - (sevRank[(a.severity||'').toLowerCase()] || 0);
+            if (s !== 0) return s;
+            return new Date(b.reportedDate || 0) - new Date(a.reportedDate || 0);
+          });
+          setReports(data);
+          setPage(1);
+          setHasMore((res.meta?.pagination?.page || 1) < (res.meta?.pagination?.pageCount || 1));
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (_) {}
+    // fallback mock
     setTimeout(() => {
       let data = [...mockExposureData];
       if (severityFilter !== 'all') {
@@ -38,7 +63,6 @@ const ExposurePage = () => {
       if (typeFilter !== 'all') {
         data = data.filter(r => r.type.toLowerCase().includes(typeFilter));
       }
-      // Sort by severity (Critical > High > Medium > Low) then newest
       const sevRank = { critical: 4, high: 3, medium: 2, low: 1 };
       data.sort((a,b) => {
         const s = sevRank[b.severity.toLowerCase()] - sevRank[a.severity.toLowerCase()];
@@ -49,14 +73,30 @@ const ExposurePage = () => {
       setPage(1);
       setHasMore(true);
       setLoading(false);
-    }, 600);
+    }, 300);
   };
 
-  const loadMoreReports = () => {
+  const loadMoreReports = async () => {
     if (loading) return;
+    if (ENABLE_CMS) {
+      setLoading(true);
+      try {
+        const next = page + 1;
+  const res = await fetchExposures({ page: next, pageSize: 20 });
+  const items = res?.data || [];
+        setReports(prev => [...prev, ...items]);
+        setPage(next);
+        setHasMore((res?.meta?.pagination?.page || next) < (res?.meta?.pagination?.pageCount || next));
+        setLoading(false);
+        return;
+      } catch (_) {
+        // fall through to mock
+      }
+      setLoading(false);
+    }
+    // mock pagination
     setLoading(true);
     setTimeout(() => {
-      // Simulate duplication with new IDs & timestamps
       const more = mockExposureData.slice(0,3).map(r => ({
         ...r,
         id: r.id + page * 100,
@@ -68,7 +108,7 @@ const ExposurePage = () => {
       setPage(p => p + 1);
       if (page >= 2) setHasMore(false);
       setLoading(false);
-    }, 800);
+    }, 500);
   };
 
   const formatTime = (iso) => new Date(iso).toLocaleString(undefined, { hour12: false });

@@ -18,16 +18,7 @@ const NewsDetailPage = () => {
         const data = await fetchNewsBySlug(slug);
         if (!mounted) return;
         if (data) {
-          const item = {
-            id: data.id,
-            slug: data.attributes?.slug,
-            title: data.attributes?.title,
-            content: data.attributes?.content || data.attributes?.excerpt || '',
-            source: data.attributes?.source || 'News',
-            timestamp: data.attributes?.timestamp || data.attributes?.publishedAt || new Date().toISOString(),
-            tags: data.attributes?.tags || []
-          };
-          setN(item);
+          setN(data);
         } else {
           setN(newsMock.find(x => x.slug === slug) || null);
         }

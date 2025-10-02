@@ -34,7 +34,7 @@ const siteContent = {
     line2: 'With Confidence',
     subtext:
       'Professional verification service for gamble platforms. Get real-time authenticity checks, security reviews, and fraud alerts.',
-    hotSearches: ['365BET', 'Coinbase', 'Kraken', 'Huobi', 'KuCoin'],
+    hotSearches: ['bet365', 'pinnacle', '1xbet', 'betway', 'unibet'],
     stats: [
       { value: '500+', label: 'Verified Entries' },
       { value: '24/7', label: 'Monitoring Service' },
@@ -132,6 +132,18 @@ const siteContent = {
         url: '#'
       }
     ]
+  },
+
+  // Home CTA configuration (Join Our Mission)
+  cta: {
+    reportPlatform: {
+      label: 'Report Platform',
+      to: '/submit'
+    },
+    becomePartner: {
+      label: 'Become Partner',
+      to: '#contact'
+    }
   },
 
   // Static page titles/descriptions (non-CMS)

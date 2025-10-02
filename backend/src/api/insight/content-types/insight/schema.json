@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "insights",
+  "info": {
+    "singularName": "insight",
+    "pluralName": "insights",
+    "displayName": "Insights"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "category": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Technology",
+      "enum": [
+        "Technology",
+        "Market",
+        "Security",
+        "Economy",
+        "Trading"
+      ]
+    },
+    "author": {
+      "type": "string"
+    },
+    "excerpt": {
+      "type": "text"
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "timestamp": {
+      "type": "datetime"
+    },
+    "read": {
+      "type": "string"
+    }
+  }
+}

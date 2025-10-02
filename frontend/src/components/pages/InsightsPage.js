@@ -1,20 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import MasonryLayout from '../ui/MasonryLayout';
-import { insights } from '../../data/mock';
+import { insights as mockInsights } from '../../data/mock';
 import siteContent from '../../config/siteContent';
+import { ENABLE_CMS } from '../../config/cms';
+import { fetchInsights } from '../../lib/cmsClient';
 
 const InsightsPage = () => {
-  const articles = insights;
-  const loading = false;
-  const hasMore = false;
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
 
   const badge = (c) => {
     const map = { Technology: 'bg-purple-100 text-purple-700', Market: 'bg-blue-100 text-blue-700', Security: 'bg-red-100 text-red-700', Economy: 'bg-green-100 text-green-700', Trading: 'bg-indigo-100 text-indigo-700' };
     return map[c] || 'bg-gray-100 text-gray-700';
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        if (ENABLE_CMS) {
+          const res = await fetchInsights({ page: 1, pageSize: 30 });
+          const list = res?.data || [];
+          if (!cancelled) {
+            setArticles(list);
+            setHasMore((res?.meta?.pagination?.page || 1) < (res?.meta?.pagination?.pageCount || 1));
+          }
+        } else {
+          if (!cancelled) {
+            setArticles(mockInsights);
+            setHasMore(false);
+          }
+        }
+      } catch (_) {
+        if (!cancelled) {
+          setArticles(mockInsights);
+          setHasMore(false);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const renderArticle = (a) => (
     <Link to={`/insights/${a.slug}`} className="block bg-white rounded-xl shadow p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">

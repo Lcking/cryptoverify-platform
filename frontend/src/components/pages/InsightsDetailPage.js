@@ -1,12 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
-import { insights } from '../../data/mock';
+import { insights as mockInsights } from '../../data/mock';
+import { ENABLE_CMS } from '../../config/cms';
+import { fetchInsightBySlug } from '../../lib/cmsClient';
 
 const InsightsDetailPage = () => {
   const { slug } = useParams();
-  const item = insights.find(n => n.slug === slug);
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        if (ENABLE_CMS) {
+          const data = await fetchInsightBySlug(slug);
+          if (!cancelled) setItem(data || null);
+          setLoading(false);
+          return;
+        }
+      } catch (_) {}
+      if (!cancelled) {
+        setItem(mockInsights.find((n) => n.slug === slug) || null);
+        setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <PageLayout title="Loading Insight..." description="Loading insight content">
+        <div className="max-w-5xl mx-auto px-4 py-10">
+          <p className="text-slate-500">Loading...</p>
+        </div>
+      </PageLayout>
+    );
+  }
 
   if (!item) {
     return (
@@ -34,19 +67,7 @@ const InsightsDetailPage = () => {
           <span className="mx-2">•</span>
           <span>{item.read} read</span>
         </div>
-        <div className="mt-6 prose max-w-none">
-          <p>{item.excerpt}</p>
-          <p>
-            This deep-dive explores signals, counterpoints, and practical implications for teams and operators.
-            It aims to be actionable, concise, and forward-looking, avoiding hype while highlighting real traction.
-          </p>
-          <h3>Key Takeaways</h3>
-          <ul>
-            <li>Context framing and scope boundaries</li>
-            <li>Primary drivers and adoption constraints</li>
-            <li>Operational considerations and metrics</li>
-          </ul>
-        </div>
+        <div className="mt-6 prose max-w-none" dangerouslySetInnerHTML={{ __html: item.content || `<p>${item.excerpt || ''}</p>` }} />
       </article>
     </PageLayout>
   );

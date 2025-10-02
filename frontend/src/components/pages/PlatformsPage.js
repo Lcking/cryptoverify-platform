@@ -4,6 +4,8 @@ import Breadcrumbs from '../ui/Breadcrumbs';
 import { Link } from 'react-router-dom';
 import MasonryLayout from '../ui/MasonryLayout';
 import siteContent from '../../config/siteContent';
+import { ENABLE_CMS } from '../../config/cms';
+import { fetchPlatforms } from '../../lib/cmsClient';
 
 const PlatformsPage = () => {
   const [platforms, setPlatforms] = useState([]);
@@ -11,35 +13,46 @@ const PlatformsPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
 
-  // 增加可选 logo 字段
-  const data = [
-    { id: 1, slug: 'binance', name: 'Binance', score: 9.8, business: 'Global Exchange', summary: 'Largest by volume with wide derivatives products.', pairs: 1400, volume: '$15.2B', established: 2017, logo: 'https://via.placeholder.com/64x64/f3b322/ffffff?text=BN' },
-    { id: 2, slug: 'coinbase-pro', name: 'Coinbase Pro', score: 9.5, business: 'Regulated Exchange', summary: 'US regulated, strong compliance & custody.', pairs: 250, volume: '$2.8B', established: 2012, logo: 'https://via.placeholder.com/64x64/0052ff/ffffff?text=CB' },
-    { id: 3, slug: 'kraken', name: 'Kraken', score: 9.3, business: 'Professional Exchange', summary: 'Advanced features & security reputation.', pairs: 400, volume: '$1.2B', established: 2011, logo: 'https://via.placeholder.com/64x64/5741d9/ffffff?text=KR' },
-    { id: 4, slug: 'huobi', name: 'Huobi', score: 8.7, business: 'Global Digital Asset', summary: 'Wide altcoin support & derivatives.', pairs: 600, volume: '$800M', established: 2013 },
-    { id: 5, slug: 'kucoin', name: 'KuCoin', score: 8.4, business: 'Altcoin Exchange', summary: 'Known for emerging token listings.', pairs: 700, volume: '$600M', established: 2017 }
-  ];
-
   useEffect(() => {
-    if (platforms.length === 0) {
+    let cancelled = false;
+    async function load() {
       setLoading(true);
-      setTimeout(() => { setPlatforms(data); setLoading(false); }, 400);
+      try {
+        if (ENABLE_CMS) {
+          const res = await fetchPlatforms({ page: 1, pageSize: 20 });
+          const items = res?.data || [];
+          if (!cancelled) {
+            setPlatforms(items);
+            setPage(1);
+            setHasMore((res?.meta?.pagination?.page || 1) < (res?.meta?.pagination?.pageCount || 1));
+          }
+        } else {
+          if (!cancelled) setPlatforms([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
-  }, []); // eslint-disable-line
+    load();
+    return () => { cancelled = true; };
+  }, []);
 
-  const loadMore = () => {
-    if (loading) return;
+  const loadMore = async () => {
+    if (loading || !ENABLE_CMS) return;
     setLoading(true);
-    setTimeout(() => {
-      const extra = data.slice(0,3).map(p => ({ ...p, id: p.id + page * 100, name: p.name + ' X' }));
-      setPlatforms(prev => [...prev, ...extra]);
-      setPage(p => p + 1);
-      if (page >= 2) setHasMore(false);
+    try {
+      const next = page + 1;
+      const res = await fetchPlatforms({ page: next, pageSize: 20 });
+      const items = res?.data || [];
+      setPlatforms(prev => [...prev, ...items]);
+      setPage(next);
+      setHasMore((res?.meta?.pagination?.page || next) < (res?.meta?.pagination?.pageCount || next));
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
-  const scoreClass = (s) => s >= 9 ? 'text-green-600' : s >= 8 ? 'text-yellow-600' : 'text-gray-600';
+  const scoreClass = (s) => (s || 0) >= 9 ? 'text-green-600' : (s || 0) >= 8 ? 'text-yellow-600' : 'text-gray-600';
 
   // 渲染Logo（含占位与错误回退）
   const Logo = ({ src, alt }) => {

@@ -166,12 +166,12 @@ const ValuesSection = () => {
               share your experiences, and protect the community.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105">
-                Report Platform
-              </button>
-              <button className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-lg font-medium transition-all duration-300">
-                Become Partner
-              </button>
+              <a href={siteContent?.cta?.reportPlatform?.to || '#'} className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105">
+                {siteContent?.cta?.reportPlatform?.label || 'Report Platform'}
+              </a>
+              <a href={siteContent?.cta?.becomePartner?.to || '#'} className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-lg font-medium transition-all duration-300">
+                {siteContent?.cta?.becomePartner?.label || 'Become Partner'}
+              </a>
             </div>
           </div>
         </div>

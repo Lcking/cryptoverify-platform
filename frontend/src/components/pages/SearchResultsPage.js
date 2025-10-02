@@ -4,6 +4,8 @@ import PageLayout from '../layout/PageLayout';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import { platforms, news, insights, exposureReports, verifications } from '../../data/mock';
 import { searchAll } from '../../api/searchClient';
+import { ENABLE_CMS } from '../../config/cms';
+import { fetchVerifications } from '../../lib/cmsClient';
 import siteContent from '../../config/siteContent';
 
 function useQuery() {
@@ -32,7 +34,23 @@ const SearchResultsPage = () => {
       const res = await searchAll(rawQ);
       if (!mounted) return;
       if (res.ok) {
-        setServerData(res.data);
+        let data = res.data || {};
+        // 当服务端未返回 verifications 或为空时，做一个 CMS 侧的补偿查询（title/platform.slug 模糊匹配）
+        if (ENABLE_CMS && Array.isArray(data.verifications) && data.verifications.length === 0) {
+          try {
+            const vres = await fetchVerifications({
+              page: 1,
+              pageSize: 20,
+              sort: 'publishedAt:desc',
+              filters: {
+                'filters[$or][0][title][$containsi]': rawQ,
+                'filters[$or][1][platform][slug][$containsi]': rawQ,
+              }
+            });
+            data = { ...data, verifications: vres?.data || [] };
+          } catch (_) {}
+        }
+        setServerData(data);
         setError(null);
       } else {
         setServerData(null);
@@ -163,7 +181,7 @@ const SearchResultsPage = () => {
                     {verificationHits.map(v => (
                       <li key={v.slug} className="p-3 bg-white rounded-lg border hover:shadow-sm transition">
                         <Link to={`/verifications/${v.slug}`} className="text-blue-600 hover:underline font-medium">{v.title}</Link>
-                        <div className="text-xs text-gray-500 mt-1">{new Date(v.publishedAt).toLocaleDateString()}</div>
+                        <div className="text-xs text-gray-500 mt-1">{(() => { const d = new Date(v.publishedAt); return isNaN(d.getTime()) ? '' : d.toLocaleString(); })()}</div>
                       </li>
                     ))}
                   </ul>

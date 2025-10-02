@@ -23,17 +23,8 @@ const NewsPage = () => {
         const res = await fetchNews({ page: pageNum, pageSize: 20 });
         if (!mounted) return;
         if (res?.data?.length) {
-          // Strapi v4 shape: { data: [{ id, attributes: { title, slug, ... }}] }
-          const mapped = res.data.map(d => ({
-            id: d.id,
-            slug: d.attributes?.slug,
-            title: d.attributes?.title,
-            content: d.attributes?.content || d.attributes?.excerpt || '',
-            source: d.attributes?.source || 'News',
-            timestamp: d.attributes?.timestamp || d.attributes?.publishedAt || new Date().toISOString(),
-            tags: d.attributes?.tags || []
-          }));
-          setItems(mapped);
+          // 已在 cmsClient 标准化
+          setItems(res.data);
           const pg = res.meta?.pagination || { page: 1, pageCount: 1 };
           setHasMore(pg.page < pg.pageCount);
         } else {

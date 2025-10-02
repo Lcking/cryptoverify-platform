@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "verifications",
+  "info": {
+    "singularName": "verification",
+    "pluralName": "verifications",
+    "displayName": "Verification"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "platformSlug": {
+      "type": "string"
+    },
+    "verifiedAt": {
+      "type": "datetime"
+    },
+    "content": {
+      "type": "blocks"
+    },
+    "platform": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::platform.platform",
+      "inversedBy": "verifications"
+    }
+  }
+}

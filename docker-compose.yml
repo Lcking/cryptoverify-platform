@@ -1,14 +1,14 @@
-version: '3.8'
-
 services:
   strapi:
-    image: strapi/strapi:latest
+    image: node:20
     container_name: cryptoverify-strapi
+    working_dir: /srv/app
     ports:
       - "1337:1337"
     environment:
       # 如需使用 Postgres/MySQL，请设置 DATABASE_* 变量；默认使用 SQLite
       - NODE_ENV=development
+    command: sh -c "rm -rf node_modules && npm install && npm run develop"
     volumes:
       - ./backend:/srv/app
     restart: unless-stopped
