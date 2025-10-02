@@ -12,7 +12,7 @@ export default {
 
     const entityService = strapi.entityService;
 
-    const [platforms, news, exposures, verifications] = await Promise.all([
+  const [platforms, news, exposures, verifications] = await Promise.all([
       entityService.findMany('api::platform.platform' as any, {
         filters: { $or: [{ name: { $containsi: q } }, { slug: { $containsi: q } }] },
         fields: ['id', 'name', 'slug', 'score'],
@@ -30,18 +30,54 @@ export default {
         limit: 10,
       }).catch(() => []),
       entityService.findMany('api::verification.verification' as any, {
-        filters: { $or: [{ title: { $containsi: q } }, { slug: { $containsi: q } }] },
-        fields: ['id', 'title', 'slug', 'publishedAt', 'platformSlug'],
+        filters: {
+          $or: [
+            { title: { $containsi: q } },
+            { slug: { $containsi: q } },
+            { platform: { slug: { $containsi: q } } },
+            { platform: { name: { $containsi: q } } },
+          ],
+        },
+        fields: ['id', 'title', 'slug', 'publishedAt'],
+        populate: { platform: { fields: ['slug', 'name'] } },
+        sort: { publishedAt: 'desc' },
         limit: 10,
       }).catch(() => []),
     ]);
+
+    // 规范化 verifications 平台关系
+    const normalizedVerifications = (verifications as any[]).map((v) => {
+      const a = (v as any).attributes || v || {};
+      const plat = a.platform;
+      let platformSlug = '';
+      let platformName = '';
+      if (plat) {
+        if (plat.data) {
+          const node = Array.isArray(plat.data) ? plat.data[0] : plat.data;
+          const pa = (node as any)?.attributes || (node as any) || {};
+          platformSlug = pa.slug || '';
+          platformName = pa.name || '';
+        } else if (typeof plat === 'object') {
+          platformSlug = (plat as any).slug || '';
+          platformName = (plat as any).name || '';
+        }
+      }
+      return {
+        id: a.id || v.id,
+        slug: a.slug || v.slug,
+        title: a.title || v.title,
+        publishedAt: a.publishedAt || a.verifiedAt || a.releasedAt || a.createdAt || v.publishedAt || '',
+        platform: { slug: platformSlug, name: platformName },
+      };
+    });
 
     ctx.body = {
       platforms,
       news,
       insights: [],
       exposure: exposures,
-      verifications,
+      verifications: normalizedVerifications,
+      meta: { verifications: { total: normalizedVerifications.length } },
     };
   },
 };
