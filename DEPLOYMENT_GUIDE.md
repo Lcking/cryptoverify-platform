@@ -7,8 +7,8 @@ This guide helps you deploy the project on a fresh Ubuntu 22.04/24.04 server usi
 - Resources (minimum): 1 vCPU / 2 GB RAM / 30 GB SSD, Swap 2 GB
 - Recommended for small production: 2 vCPU / 4 GB RAM / 60 GB SSD, Swap 4 GB
 - Domains:
-	- Frontend: app.example.com
-	- API: api.example.com
+	- Frontend: app.gambleverify.com
+	- API: api.gambleverify.com
 
 ## 1) Install Docker & Compose
 ```bash
@@ -39,7 +39,7 @@ cp backend/.env.example backend/.env.production
 # Edit backend/.env.production and set:
 # - APP_KEYS, API_TOKEN_SALT, ADMIN_JWT_SECRET, JWT_SECRET, TRANSFER_TOKEN_SALT
 # - (Optional) database vars if using Postgres/MySQL
-# - CORS_ORIGIN=https://app.example.com
+# - CORS_ORIGIN=https://app.gambleverify.com
 ```
 
 Build frontend locally (optional) or on server:
@@ -51,15 +51,15 @@ cd ..
 ```
 
 ## 3) Configure Caddy
-Edit `deployment/Caddyfile`, replace domains:
+Edit `deployment/Caddyfile`, confirm domains:
 ```
-app.example.com {  # <- change to your app domain
+app.gambleverify.com {
 	root * /srv/www
 	try_files {path} /index.html
 	file_server
 }
 
-api.example.com {  # <- change to your API domain
+api.gambleverify.com {
 	reverse_proxy strapi:1337
 }
 ```
@@ -73,7 +73,7 @@ docker compose -f docker-compose.prod.yml up -d
 On first run, Strapi will build the admin panel and start the server.
 
 ## 5) Initialize Strapi
-Visit: https://api.example.com/admin
+Visit: https://api.gambleverify.com/admin
 - Create admin account
 - Settings → Users & Permissions → Roles → Public: allow find/findOne for platforms/news/insights/exposures/verifications and your custom `/api/search` route
 - If you use API Tokens: create a Read token and configure frontend env `REACT_APP_CMS_TOKEN`
@@ -81,7 +81,7 @@ Visit: https://api.example.com/admin
 ## 6) Frontend → Backend integration
 - Set React env (for hosting elsewhere, e.g. Netlify/Cloudflare Pages):
 	- `REACT_APP_ENABLE_CMS=true`
-	- `REACT_APP_CMS_URL=https://api.example.com`
+		- `REACT_APP_CMS_URL=https://api.gambleverify.com`
 - Rebuild if env changed and redeploy static assets.
 
 ## 7) Health checks
