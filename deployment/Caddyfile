@@ -7,6 +7,15 @@ app.gambleverify.com {
   file_server
 }
 
+# Redirect www and apex to the canonical app domain
+www.gambleverify.com {
+  redir https://app.gambleverify.com{uri} 301
+}
+
+gambleverify.com {
+  redir https://app.gambleverify.com{uri} 301
+}
+
 api.gambleverify.com {
   encode zstd gzip
   reverse_proxy strapi:1337
