@@ -18,11 +18,16 @@ gambleverify.com {
 
 api.gambleverify.com {
   encode zstd gzip
-  reverse_proxy strapi:1337
+  reverse_proxy strapi:1337 {
+    # Ensure Strapi sees the original scheme/host for secure cookies
+    header_up X-Forwarded-Proto {scheme}
+    header_up X-Forwarded-Host {host}
+    header_up Host {host}
+  }
   header /* {
     Access-Control-Allow-Origin "https://app.gambleverify.com"
     Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
     Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization"
-    Access-Control-Allow-Credentials false
+    Access-Control-Allow-Credentials true
   }
 }
