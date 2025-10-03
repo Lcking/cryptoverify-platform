@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: cryptoverify-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      # Serve frontend static assets (build output)
+      - ../frontend/build:/srv/www:ro
+    depends_on:
+      - strapi
+
+  strapi:
+    image: node:20
+    container_name: cryptoverify-strapi-prod
+    working_dir: /srv/app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 1337
+    env_file:
+      - ../backend/.env.production
+    command: sh -c "npm ci && npm run build && npm run start"
+    expose:
+      - "1337"
+    volumes:
+      # Mount codebase for simple rollout; you can switch to a built image later
+      - ../backend:/srv/app
+      # Persist database (SQLite) and uploads outside of code tree
+      - strapi_db:/srv/app/.tmp
+      - strapi_uploads:/srv/app/public/uploads
+
+volumes:
+  caddy_data:
+  caddy_config:
+  strapi_db:
+  strapi_uploads:

@@ -1,0 +1,19 @@
+# Replace the example domains with your real domains
+
+app.example.com {
+  encode zstd gzip
+  root * /srv/www
+  try_files {path} /index.html
+  file_server
+}
+
+api.example.com {
+  encode zstd gzip
+  reverse_proxy strapi:1337
+  header /* {
+    Access-Control-Allow-Origin "https://app.example.com"
+    Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization"
+    Access-Control-Allow-Credentials false
+  }
+}
