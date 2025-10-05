@@ -20,7 +20,8 @@ api.gambleverify.com {
   encode zstd gzip
   reverse_proxy strapi:1337 {
     # Ensure Strapi sees the original scheme/host for secure cookies
-    header_up X-Forwarded-Proto {scheme}
+    # IMPORTANT: {scheme} here would be the upstream scheme (http). We must force https.
+    header_up X-Forwarded-Proto https
     header_up X-Forwarded-Host {host}
     header_up Host {host}
   }
