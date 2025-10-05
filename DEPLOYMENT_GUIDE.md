@@ -124,6 +124,33 @@ docker compose -f deployment/docker-compose.prod.yml restart caddy
 - API: `curl -I https://api.gambleverify.com/api/search?q=test`
 - App: open `https://app.gambleverify.com/search?q=test`
 
+### 7a) Permissions & data checklist (avoid 403/empty)
+If your `/api/search` returns empty arrays and `/api/<collection>` returns 403 for anonymous requests, follow this:
+
+1. Choose access mode for frontend:
+	- Public role (no token): In Strapi Admin → Settings → Users & Permissions → Roles → Public, enable `find`/`findOne` for: platforms, news, insights, exposures, verifications; also enable the custom `/api/search` route (auth: false).
+	- API Token mode: Create a Read-only API Token (Settings → API Tokens). Set it as `REACT_APP_CMS_TOKEN` during frontend build so requests include `Authorization: Bearer <token>`.
+
+2. Verify data exists and is published:
+	- Ensure there are published entries in those collections (Draft & Publish enabled means only Published records are returned to public).
+
+3. Quick probes (expect 200):
+```bash
+curl -I https://api.gambleverify.com/api/search?q=test
+curl -I https://api.gambleverify.com/api/platforms
+curl -I https://api.gambleverify.com/api/news
+curl -I https://api.gambleverify.com/api/insights
+curl -I https://api.gambleverify.com/api/exposures
+curl -I https://api.gambleverify.com/api/verifications
+```
+
+4. If still 403 but you prefer token mode, verify frontend build has token:
+	- Build env includes `REACT_APP_CMS_TOKEN=<your-token>`
+	- Network requests from the app contain `Authorization: Bearer ...`
+
+5. If `/admin/auth/login` shows login instead of registration:
+	- This is expected when an admin already exists (checked by `/admin/init` → `hasAdmin: true`). Use login or reset the password as described above.
+
 ## 8) Backups & operations
 - Volumes:
 	- `strapi_uploads` (user uploads)
