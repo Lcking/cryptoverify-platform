@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ENABLE_CMS } from '../../config/cms';
+import { fetchNews, fetchInsights, fetchExposures, fetchVerifications } from '../../lib/cmsClient';
 
 const ContentTabs = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -30,8 +33,8 @@ const ContentTabs = () => {
     }
   ];
 
-  // Mock data for different tabs
-  const newsItems = [
+  // Data states
+  const [newsItems, setNewsItems] = useState([
     {
       title: 'Bitcoin Reaches New All-Time High Amid Institutional Adoption',
       time: '2 minutes ago',
@@ -50,9 +53,9 @@ const ContentTabs = () => {
       source: 'Finance Watch',
       type: 'Analysis'
     }
-  ];
+  ]);
 
-  const verificationItems = [
+  const [verificationItems, setVerificationItems] = useState([
     {
       platform: 'Binance',
       status: 'Verified',
@@ -74,9 +77,9 @@ const ContentTabs = () => {
       lastCheck: '8 minutes ago',
       badges: ['Licensed', 'Secure', 'Transparent']
     }
-  ];
+  ]);
 
-  const insightItems = [
+  const [insightItems, setInsightItems] = useState([
     {
       title: 'DeFi Market Analysis: Trends and Opportunities',
       category: 'Analysis',
@@ -95,9 +98,9 @@ const ContentTabs = () => {
       readTime: '12 min read',
       author: 'Research Team'
     }
-  ];
+  ]);
 
-  const exposureItems = [
+  const [exposureItems, setExposureItems] = useState([
     {
       platform: 'FakeExchange Pro',
       type: 'Ponzi Scheme',
@@ -119,7 +122,62 @@ const ContentTabs = () => {
       status: 'Warning Issued',
       severity: 'Medium'
     }
-  ];
+  ]);
+
+  // Try to fetch live data from CMS
+  useEffect(() => {
+    if (!ENABLE_CMS) return;
+    (async () => {
+      try {
+        const [n, i, e, v] = await Promise.all([
+          fetchNews({ page: 1, pageSize: 6 }),
+          fetchInsights({ page: 1, pageSize: 6 }),
+          fetchExposures({ page: 1, pageSize: 6 }),
+          fetchVerifications({ page: 1, pageSize: 6 }),
+        ]);
+        if (Array.isArray(n?.data) && n.data.length) {
+          setNewsItems(n.data.map(x => ({
+            title: x.title,
+            time: new Date(x.timestamp).toLocaleString(),
+            source: x.source || 'News',
+            type: 'Update',
+            slug: x.slug,
+          })));
+        }
+        if (Array.isArray(i?.data) && i.data.length) {
+          setInsightItems(i.data.map(x => ({
+            title: x.title,
+            category: x.category || 'Insight',
+            readTime: x.read || '',
+            author: x.author || 'Research',
+            slug: x.slug,
+          })));
+        }
+        if (Array.isArray(e?.data) && e.data.length) {
+          setExposureItems(e.data.map(x => ({
+            platform: x.platform,
+            type: x.type,
+            reportedDate: x.reportedDate,
+            status: x.status,
+            severity: x.severity,
+            slug: x.slug,
+          })));
+        }
+        if (Array.isArray(v?.data) && v.data.length) {
+          setVerificationItems(v.data.map(x => ({
+            platform: x.platformName || x.platformSlug || '',
+            status: 'Verified',
+            score: 0,
+            lastCheck: new Date(x.publishedAt).toLocaleString(),
+            badges: [],
+            slug: x.slug,
+          })));
+        }
+      } catch (_) {
+        // Silent fallback to mocks
+      }
+    })();
+  }, []);
 
   const getTabContent = () => {
     switch (tabs[activeTab].id) {
@@ -275,9 +333,17 @@ const ContentTabs = () => {
 
         {/* View more button */}
         <div className="text-center mt-12">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105">
+          <Link
+            to={
+              tabs[activeTab].id === 'news' ? '/news' :
+              tabs[activeTab].id === 'verification' ? '/verifications' :
+              tabs[activeTab].id === 'insights' ? '/insights' :
+              '/exposure'
+            }
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105 inline-block"
+          >
             View More {tabs[activeTab].label}
-          </button>
+          </Link>
         </div>
       </div>
     </section>

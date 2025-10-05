@@ -1,29 +1,36 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import siteContent from '../../config/siteContent';
 
 const FeaturesSection = () => {
-  const features = [
-    {
-      icon: 'fas fa-list-check',
-      title: 'Platform Directory',
-      description: 'Comprehensive database of verified cryptocurrency trading platforms with detailed information and ratings.',
-      link: '#platforms',
-      color: 'blue'
-    },
-    {
-      icon: 'fas fa-shield-check',
-      title: 'Real-time Verification',
-      description: 'Advanced verification system that continuously monitors platform authenticity and security status.',
-      link: '#verification',
-      color: 'green'
-    },
-    {
-      icon: 'fas fa-exclamation-triangle',
-      title: 'Fraud Exposure',
-      description: 'Immediate alerts and exposure of fraudulent platforms to protect the cryptocurrency community.',
-      link: '#exposure',
-      color: 'red'
-    }
-  ];
+  const features = (siteContent.features?.items && siteContent.features.items.length
+    ? siteContent.features.items
+    : [
+        {
+          icon: 'fas fa-list-check',
+          title: 'Platform Directory',
+          description:
+            'Comprehensive directory of verified gamble platforms with clear information and ratings.',
+          link: '/platforms',
+          color: 'blue',
+        },
+        {
+          icon: 'fas fa-shield-halved',
+          title: 'Real-time Verification',
+          description:
+            'Advanced verification that continuously monitors platform authenticity and security status.',
+          link: '/verifications',
+          color: 'green',
+        },
+        {
+          icon: 'fas fa-exclamation-triangle',
+          title: 'Fraud Exposure',
+          description:
+            'Immediate alerts and exposure of fraudulent platforms to protect the community.',
+          link: '/exposure',
+          color: 'red',
+        },
+      ]);
 
   const getColorClasses = (color) => {
     const colors = {
@@ -52,11 +59,11 @@ const FeaturesSection = () => {
         {/* Section header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Our Core Services
+            {siteContent.features?.title || 'Our Core Services'}
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Comprehensive cryptocurrency platform verification and monitoring services 
-            designed to protect traders and investors from fraud.
+            {siteContent.features?.subtitle ||
+              'Comprehensive gamble platform verification and monitoring services designed to reduce risk and prevent fraud.'}
           </p>
         </div>
 
@@ -85,13 +92,13 @@ const FeaturesSection = () => {
                 </p>
 
                 {/* CTA Button */}
-                <a
-                  href={feature.link}
+                <Link
+                  to={feature.link}
                   className={`inline-flex items-center px-6 py-3 ${colorClasses.button} text-white rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105 group`}
                 >
                   Learn More
                   <i className="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-                </a>
+                </Link>
               </div>
             );
           })}

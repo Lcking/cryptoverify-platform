@@ -28,6 +28,36 @@ const siteContent = {
     }
   },
 
+  // Core features (homepage, non-CMS)
+  features: {
+    title: 'Our Core Services',
+    subtitle:
+      'Comprehensive gamble platform verification and monitoring services designed to reduce risk and prevent fraud.',
+    items: [
+      {
+        icon: 'fas fa-list-check',
+        title: 'Platform Directory',
+        description: 'Comprehensive directory of verified gamble platforms with clear information and ratings.',
+        link: '/platforms',
+        color: 'blue'
+      },
+      {
+        icon: 'fas fa-shield-halved',
+        title: 'Real-time Verification',
+        description: 'Advanced verification that continuously monitors platform authenticity and security status.',
+        link: '/verifications',
+        color: 'green'
+      },
+      {
+        icon: 'fas fa-exclamation-triangle',
+        title: 'Fraud Exposure',
+        description: 'Immediate alerts and exposure of fraudulent platforms to protect the community.',
+        link: '/exposure',
+        color: 'red'
+      }
+    ]
+  },
+
   // Hero section static texts (not from CMS)
   hero: {
     line1: 'Verify Gamble Platforms',
@@ -44,18 +74,19 @@ const siteContent = {
 
   // Footer links and social profiles
   footer: {
+    description: 'Professional platform verification service for gamble platforms. Protecting users through comprehensive security assessments and real-time monitoring.',
     columns: {
       Platform: [
-        { name: 'Directory', href: '#platforms' },
-        { name: 'Verification Process', href: '#verification' },
-        { name: 'Security Standards', href: '#security' },
-        { name: 'API Access', href: '#api' }
+        { name: 'Directory', href: '/platforms' },
+        { name: 'Verification Records', href: '/verifications' },
+        { name: 'Fraud Exposure', href: '/exposure' },
+        { name: 'API Access', href: '/docs/api' }
       ],
       Resources: [
-        { name: 'Blog', href: '#blog' },
-        { name: 'Research', href: '#research' },
-        { name: 'Documentation', href: '#docs' },
-        { name: 'Help Center', href: '#help' }
+        { name: 'News', href: '/news' },
+        { name: 'Insights', href: '/insights' },
+        { name: 'Documentation', href: '/docs' },
+        { name: 'Help Center', href: '/help' }
       ],
       Company: [
         { name: 'About Us', href: '#about' },
@@ -100,21 +131,21 @@ const siteContent = {
         name: 'CoinTelegraph',
         type: 'News Partner',
         logo: 'https://via.placeholder.com/120x60/e5e7eb/6b7280?text=Cointelegraph',
-        description: 'Crypto and blockchain news with global reach.',
+        description: 'Blockchain and industry news with global reach.',
         url: '#'
       },
       {
         name: 'Blockchain.com',
         type: 'Technology Partner',
         logo: 'https://via.placeholder.com/120x60/e5e7eb/6b7280?text=Blockchain',
-        description: 'Wallet and infrastructure provider in the crypto space.',
+        description: 'Wallet and infrastructure provider for the digital assets space.',
         url: '#'
       },
       {
         name: 'CryptoCompare',
         type: 'Data Partner',
         logo: 'https://via.placeholder.com/120x60/e5e7eb/6b7280?text=CryptoCompare',
-        description: 'Market data and indices for digital assets.',
+        description: 'Market data and indices provider.',
         url: '#'
       },
       {
@@ -163,7 +194,7 @@ const siteContent = {
       seo: {
         title: 'Live Gamble News - 24/7 Updates',
         description: 'Real-time market intelligence and concise gamble asset developments.',
-        keywords: 'gamble news, market updates, crypto news, live news'
+        keywords: 'gamble news, market updates, live news'
       }
     },
     platforms: {

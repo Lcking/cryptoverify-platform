@@ -4,8 +4,9 @@ import siteContent from '../../config/siteContent';
 const Footer = () => {
   const footerLinks = siteContent.footer?.columns || {};
   const socialLinks = siteContent.footer?.social || [];
-  const siteName = siteContent.brand?.siteName || 'CryptoVerify';
+  const siteName = siteContent.brand?.siteName || 'GambleVerify';
   const badges = siteContent.footer?.badges || [];
+  const footerIntro = siteContent.footer?.description || 'Professional platform verification service for gamble platforms. Protecting users through comprehensive security assessments and real-time monitoring.';
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -51,9 +52,7 @@ const Footer = () => {
               <span className="text-xl font-bold">{siteName}</span>
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
-              Professional cryptocurrency platform verification service. 
-              Protecting traders and investors through comprehensive 
-              security assessments and real-time monitoring.
+              {footerIntro}
             </p>
             
             {/* Social Links */}
