@@ -139,3 +139,20 @@
 - 验收：待实现。
 - 问题与解决：生产长期方案可扩展到外部邮件服务（Mailgun/SES）。
 - Bug 修复记录：backlog001。
+
+## TASK-012 生产后台登录 500（Secure Cookie/代理头）排查（进行中）
+- 描述：线上 https://api.gambleverify.com/admin 登录提交后返回 500；日志显示 `Failed to create admin refresh session Cannot send secure cookie over unencrypted connection`。
+- 根因：反向代理未正确传递 HTTPS 协议（X-Forwarded-Proto），导致 Strapi 认为连接不安全，拒绝设置 Secure Cookie。
+- 开发/运维动作：
+  - 确认 `backend/config/server.ts`：`proxy: true` 且 `url` = `STRAPI_ADMIN_BACKEND_URL`。
+  - 更新 `deployment/Caddyfile`：将 `header_up X-Forwarded-Proto` 固定为 `https`（而不是上游 `{scheme}`）。
+  - 确认 `backend/.env.production`：
+    - `STRAPI_ADMIN_BACKEND_URL=https://api.gambleverify.com`
+    - `FRONTEND_ORIGIN=https://app.gambleverify.com`
+  - 重启反代与后端：`docker compose -f deployment/docker-compose.prod.yml restart caddy strapi`。
+- 当前状态：代码已更新并推送；待服务器拉取并重启后再次登录验证。
+- 验收计划：
+  1) 登录 https://api.gambleverify.com/admin 成功（`POST /admin/login` → 200）。
+  2) `/admin/init` 正常；无 `secure cookie` 报错出现在日志。
+  3) 设置 Public 角色（或 Token），`/api/platforms` 等集合返回 200；`/api/search` 返回数据。
+- 防回归：将“X-Forwarded-Proto=https + STRAPI_ADMIN_BACKEND_URL + proxy: true”纳入部署清单；更换代理或证书组件后必验此项。
