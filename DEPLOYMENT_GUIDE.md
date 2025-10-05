@@ -29,7 +29,7 @@ newgrp docker
 ## 2) Clone project & prepare files
 ```bash
 cd /opt
-git clone https://github.com/<your-org>/cryptoverify-platform.git
+git clone https://github.com/Lcking/cryptoverify-platform.git
 cd cryptoverify-platform
 ```
 
@@ -39,7 +39,9 @@ cp backend/.env.example backend/.env.production
 # Edit backend/.env.production and set:
 # - APP_KEYS, API_TOKEN_SALT, ADMIN_JWT_SECRET, JWT_SECRET, TRANSFER_TOKEN_SALT
 # - (Optional) database vars if using Postgres/MySQL
-# - CORS_ORIGIN=https://app.gambleverify.com
+# - FRONTEND_ORIGIN=https://app.gambleverify.com
+# - STRAPI_ADMIN_BACKEND_URL=https://api.gambleverify.com
+# These ensure secure cookies work behind the proxy and CORS matches your frontend origin.
 ```
 
 Build frontend locally (optional) or on server:
@@ -74,19 +76,53 @@ On first run, Strapi will build the admin panel and start the server.
 
 ## 5) Initialize Strapi
 Visit: https://api.gambleverify.com/admin
-- Create admin account
+- Create admin account (first-time only). You do NOT need to register on strapi.io — Strapi admin is self-hosted per-instance.
+- If an admin already exists, you'll see a Login screen (no registration). Use the existing credentials.
 - Settings → Users & Permissions → Roles → Public: allow find/findOne for platforms/news/insights/exposures/verifications and your custom `/api/search` route
 - If you use API Tokens: create a Read token and configure frontend env `REACT_APP_CMS_TOKEN`
+
+### 5a) Admin login, forgot password, and reset
+- Forgot password: use the “Forgot password?” link on the login page. This requires a working email provider configured in Strapi.
+- If email is not configured or the email cannot be received, you can reset the admin password from the running container:
+
+```bash
+# Open a shell in the Strapi container
+docker compose -f deployment/docker-compose.prod.yml exec strapi sh
+
+# Inside the container, run the Strapi admin reset command
+# (npx will resolve the local Strapi binary in node_modules)
+npx strapi admin:reset-user-password --email="admin@yourdomain.com" --password='NewStrongP@ssw0rd!'
+
+# Then exit the container
+exit
+```
+
+Notes:
+- The exact command may vary slightly by Strapi version; if the above fails, try `yarn strapi admin:reset-user-password` or `node node_modules/.bin/strapi admin:reset-user-password` inside the container.
+- After the first admin is created, registration is disabled by design; subsequent admins must be invited from the Admin UI.
 
 ## 6) Frontend → Backend integration
 - Set React env (for hosting elsewhere, e.g. Netlify/Cloudflare Pages):
 	- `REACT_APP_ENABLE_CMS=true`
-		- `REACT_APP_CMS_URL=https://api.gambleverify.com`
+	- `REACT_APP_CMS_URL=https://api.gambleverify.com`
 - Rebuild if env changed and redeploy static assets.
 
+### Rebuild frontend on server (Dockerized Node)
+```bash
+# Run inside repo root on server
+docker run --rm \
+	-e REACT_APP_ENABLE_CMS=true \
+	-e REACT_APP_CMS_URL=https://api.gambleverify.com \
+	-v "$PWD/frontend":/app \
+	-w /app node:20 bash -lc "npm ci && npm run build"
+
+# Restart Caddy (static is served from ../frontend/build mounted to /srv/www)
+docker compose -f deployment/docker-compose.prod.yml restart caddy
+```
+
 ## 7) Health checks
-- API: `curl -I https://api.example.com/api/search?q=test`
-- App: open `https://app.example.com/search?q=test`
+- API: `curl -I https://api.gambleverify.com/api/search?q=test`
+- App: open `https://app.gambleverify.com/search?q=test`
 
 ## 8) Backups & operations
 - Volumes:

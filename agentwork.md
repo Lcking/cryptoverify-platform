@@ -89,3 +89,53 @@
   - Apple Silicon 与镜像平台不匹配 → 改用 Debian Node 运行后端以便编译原生模块。
   - 跟随日志无新输出看似“卡住” → 正常现象，服务空闲时无新日志；建议只在需要时短时查看。
 - 代码审核意见：建议后续生产使用 Postgres，并配置对象存储上传；compose 可分离 Nginx/Caddy 与证书获取。
+
+## TASK-007 首页文案与入口修正（已验收）
+- 描述：将首页非 CMS 文案集中管理；替换 crypto/cryptocurrency 用语为符合定位的 gamble；修复 Real-time Verification 图标；修正 Learn More 跳转。
+- 开发：
+  - 新增 `siteContent.features` 配置，集中首页三项服务文案与链接。
+  - `FeaturesSection` 改用 `siteContent`，Learn More 使用 `<Link>` 指向 `/platforms` `/verifications` `/exposure`。
+  - `ValuesSection` 与 `Footer` 统一用词；“Assets Protected” 图标改为 `fa-shield-halved`。
+- 测试：本地与线上预览首页，文案/图标/跳转符合预期。
+- 验收：已通过。
+- 问题与解决：无。
+- Bug 修复记录：bug001、bug003。
+- 代码审核意见：非 CMS 文案优先集中在 `siteContent.js`，便于后续统一替换与多语言扩展。
+
+## TASK-008 实时信息板块对接 CMS（进行中）
+- 描述：ContentTabs 优先读取 CMS 的 news/insights/exposure/verifications 数据，失败回退 mock；“View More …” 链接对应栏目。
+- 开发：
+  - 在 `ContentTabs` 中接入 `cmsClient` 的 `fetchNews/fetchInsights/fetchExposures/fetchVerifications`；保持初始 mock 与失败回退。
+  - 将底部“View More …” 改为 `<Link>`，分别跳转至 `/news` `/verifications` `/insights` `/exposure`。
+- 测试：本地启用 CMS 后可展示真实数据，网络失败时展示 mock。
+- 验收：待线上数据打通后确认。
+- 问题与解决：依赖 bug004 的前端构建环境变量与 Public 权限放开。
+- Bug 修复记录：bug002。
+
+## TASK-009 生产环境数据打通（未开始）
+- 描述：前端注入 REACT_APP_*，重建并发布；Strapi Public 角色放开只读接口与 /api/search。
+- 开发/运维：
+  - 设置 `REACT_APP_ENABLE_CMS=true`、`REACT_APP_CMS_URL=https://api.gambleverify.com`；重建前端产物并替换 Caddy 静态目录。
+  - Strapi 后台设置 Public 角色权限：platforms/news/insights/exposures/verifications 的 find/findOne、自定义 /api/search。
+- 测试：线上页面能显示 CMS 数据，Network 中 CMS 请求 200 且返回非空。
+- 验收：待执行。
+- 问题与解决：如碰到 CORS 问题，核对 `backend/config/middlewares.ts` 与 Caddy 的 CORS header、Origin。
+- Bug 修复记录：bug004。
+
+## TASK-010 生产 CMS 登录/注册说明（未开始）
+- 描述：说明生产管理员与本地不同步，何时显示注册/登录，如何找回或重置密码。
+- 开发：在部署文档中追加“生产管理员”章节与重置流程。
+- 测试：N/A。
+- 验收：待文档更新。
+- 问题与解决：无。
+- Bug 修复记录：bug005。
+
+## TASK-011 邮件订阅功能（未开始）
+- 描述：后端新增 subscribers（email + createdAt + ip）；前端 Footer 表单提交，成功/失败提示，最小防刷。
+- 开发：
+  - 后端：内容类型或自定义控制器/路由 `/api/subscribe`（POST）。
+  - 前端：Footer 表单 onSubmit 校验 email，fetch 提交，loading/成功/错误反馈。
+- 测试：输入合法/不合法邮箱；重复提交速率限制；接口异常回退提示。
+- 验收：待实现。
+- 问题与解决：生产长期方案可扩展到外部邮件服务（Mailgun/SES）。
+- Bug 修复记录：backlog001。
