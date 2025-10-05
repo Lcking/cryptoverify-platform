@@ -66,6 +66,19 @@ api.gambleverify.com {
 }
 ```
 
+Recommended headers for admin HTTPS cookies behind proxy:
+```
+api.gambleverify.com {
+	reverse_proxy strapi:1337 {
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Host {host}
+		header_up Host {host}
+		header_up X-Forwarded-Port 443
+		header_up X-Forwarded-For {remote}
+	}
+}
+```
+
 ## 4) Start services
 ```bash
 cd deployment
