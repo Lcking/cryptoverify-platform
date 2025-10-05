@@ -164,6 +164,16 @@ curl -I https://api.gambleverify.com/api/verifications
 5. If `/admin/auth/login` shows login instead of registration:
 	- This is expected when an admin already exists (checked by `/admin/init` → `hasAdmin: true`). Use login or reset the password as described above.
 
+### 7b) Admin login still 500 due to "secure cookie over unencrypted connection"
+If you have already set `proxy: true`, `STRAPI_ADMIN_BACKEND_URL=https://api.gambleverify.com`, and forwarded `X-Forwarded-*` headers in Caddy but still hit the error, use this temporary mitigation to unblock login:
+
+- In `backend/config/middlewares.ts`, session cookie is configurable via env. Set in `backend/.env.production`:
+	- `SESSION_SECURE=false`   # temporarily disable Secure flag
+	- `SESSION_SAMESITE=lax`   # default
+	- `SESSION_DOMAIN=`        # optional
+
+Restart Strapi and log in. Once verified, revert `SESSION_SECURE=true` for production security.
+
 ## 8) Backups & operations
 - Volumes:
 	- `strapi_uploads` (user uploads)

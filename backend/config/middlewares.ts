@@ -1,4 +1,4 @@
-export default [
+export default ({ env }) => ([
   'strapi::logger',
   'strapi::errors',
   {
@@ -18,8 +18,11 @@ export default [
       origin: [
         'http://localhost:3000',
         'http://localhost:3001',
-        process.env.FRONTEND_ORIGIN || '',
+        env('FRONTEND_ORIGIN', ''),
+        // Legacy domain kept for backward-compat if needed
         'https://cryptoverify.com',
+        // Current app domain
+        'https://app.gambleverify.com',
       ].filter(Boolean),
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -29,7 +32,20 @@ export default [
   'strapi::poweredBy',
   'strapi::query',
   'strapi::body',
-  'strapi::session',
+  {
+    name: 'strapi::session',
+    config: {
+      // Explicit cookie settings; if reverse proxy HTTPS detection is flaky,
+      // you can temporarily set SESSION_SECURE=false in the environment to unblock admin login.
+      cookie: {
+        secure: env.bool('SESSION_SECURE', true),
+        httpOnly: true,
+        sameSite: env('SESSION_SAMESITE', 'lax'),
+        domain: env('SESSION_DOMAIN', undefined),
+        path: '/',
+      },
+    },
+  },
   'strapi::favicon',
   'strapi::public',
-];
+]);
