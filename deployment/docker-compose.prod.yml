@@ -26,6 +26,8 @@ services:
       NODE_ENV: production
       HOST: 0.0.0.0
       PORT: 1337
+      # Force Node/Koa to trust proxy headers and recognize HTTPS
+      NODE_TRUST_PROXY: "true"
     env_file:
       - ../backend/.env.production
     command: sh -c "npm ci && npm run build && npm run start"
