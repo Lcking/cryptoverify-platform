@@ -13,8 +13,13 @@ export default ({ env }) => ({
   secrets: {
     encryptionKey: env('ENCRYPTION_KEY'),
   },
+  session: {
+    secure: env.bool('ADMIN_SESSION_COOKIE_SECURE', true),
+    sameSite: env('ADMIN_SESSION_COOKIE_SAMESITE', 'lax'),
+  },
   flags: {
     nps: env.bool('FLAG_NPS', true),
     promoteEE: env.bool('FLAG_PROMOTE_EE', true),
   },
+  url: env('ADMIN_URL', '/admin'),
 });

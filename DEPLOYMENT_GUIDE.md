@@ -171,6 +171,11 @@ If you have already set `proxy: true`, `STRAPI_ADMIN_BACKEND_URL=https://api.gam
 	- `SESSION_SECURE=false`   # temporarily disable Secure flag
 	- `SESSION_SAMESITE=lax`   # default
 	- `SESSION_DOMAIN=`        # optional
+	- `ADMIN_SESSION_COOKIE_SECURE=false`   # Strapi admin refresh cookie
+	- `ADMIN_SESSION_COOKIE_SAMESITE=lax`
+
+- Optional: If your admin lives behind a sub-path, adjust:
+	- `ADMIN_URL=/admin` (default)
 
 Restart Strapi and log in. Once verified, revert `SESSION_SECURE=true` for production security.
 
