@@ -171,9 +171,11 @@ If you have already set `proxy: true`, `STRAPI_ADMIN_BACKEND_URL=https://api.gam
 	- `SESSION_SECURE=false`   # temporarily disable Secure flag
 	- `SESSION_SAMESITE=lax`   # default
 	- `SESSION_DOMAIN=`        # optional
-- In `backend/config/admin.ts`, we map the overrides to both the legacy `admin.session` config and the new `admin.auth.sessions.options.cookie` so that refresh/session cookies share the same flags. Set in `backend/.env.production`:
+- In `backend/config/admin.ts` (plus an override in `src/extensions/admin/server/shared/utils/session-auth.ts`), we map the overrides to both the legacy `admin.session` config and the new `admin.auth.cookie` helper so that refresh/session cookies share the same flags. Set in `backend/.env.production`:
 	- `ADMIN_SESSION_COOKIE_SECURE=false`
 	- `ADMIN_SESSION_COOKIE_SAMESITE=lax`
+	- `ADMIN_SESSION_COOKIE_PATH=/admin` *(optional, defaults `/admin`)*
+	- `ADMIN_SESSION_COOKIE_DOMAIN=api.gambleverify.com` *(optional)*
 
 - Optional: If your admin lives behind a sub-path, adjust:
 	- `ADMIN_URL=/admin` (default)
@@ -185,11 +187,29 @@ Restart Strapi and log in. Once verified, revert `SESSION_SECURE=true` for produ
 	- `strapi_uploads` (user uploads)
 	- `strapi_db` (SQLite data). If you switch to Postgres/MySQL, back up DB dumps instead of this volume.
 - Logs: `docker logs -f cryptoverify-strapi-prod` and `docker logs -f cryptoverify-caddy`
-- Update:
+- Rolling out updates (code or env changes):
 	```bash
 	git pull
-	docker compose -f deployment/docker-compose.prod.yml restart strapi
+	docker compose -f deployment/docker-compose.prod.yml up -d --force-recreate strapi
 	```
+	The Strapi container runs `npm ci && npm run build && npm run start` on boot. If you only pull code without recreating the container, the running process continues using the previously compiled `/srv/app/dist` bundle and old environment variables. For any backend change, force-recreate the `strapi` service so it rebuilds and loads the fresh configuration. Frontend changes still require rebuilding `frontend/build` as described earlier.
+- Inspect runtime admin cookie settings from inside the container:
+	```bash
+	docker compose -f deployment/docker-compose.prod.yml exec strapi node - <<'NODE'
+	const adminConfig = require('./dist/config/admin.js').default;
+	const env = (key, defaultValue) => process.env[key] ?? defaultValue;
+	env.bool = (key, defaultValue = false) => {
+	  const raw = process.env[key];
+	  if (raw === undefined) return defaultValue;
+	  const normalized = raw.toString().toLowerCase();
+	  if (["true", "1", "yes", "on"].includes(normalized)) return true;
+	  if (["false", "0", "no", "off"].includes(normalized)) return false;
+	  return Boolean(raw);
+	};
+	console.log(adminConfig({ env }).auth.cookie);
+	NODE
+	```
+	Strapi 的配置模块会调用 `env.bool` 等辅助函数；在纯 Node 脚本中查询配置时，记得为测试用的 `env` 补上这些方法，否则会触发 `TypeError: env.bool is not a function`。
 
 ## Notes
 - For production databases, prefer Postgres and object storage for uploads.
