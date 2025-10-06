@@ -3,7 +3,7 @@ export default ({ env }) => ({
     secret: env('ADMIN_JWT_SECRET'),
     sessions: {
       cookie: {
-        secure: env.bool('ADMIN_SESSION_COOKIE_SECURE', true),
+        secure: false, // Force disable secure flag to bypass HTTPS detection issue
         sameSite: env('ADMIN_SESSION_COOKIE_SAMESITE', 'lax'),
         path: env('ADMIN_SESSION_COOKIE_PATH', '/admin'),
         domain: env('ADMIN_SESSION_COOKIE_DOMAIN'),
