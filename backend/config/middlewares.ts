@@ -35,10 +35,9 @@ export default ({ env }) => ([
   {
     name: 'strapi::session',
     config: {
-      // Explicit cookie settings; if reverse proxy HTTPS detection is flaky,
-      // you can temporarily set SESSION_SECURE=false in the environment to unblock admin login.
+      // Force disable secure flag to bypass HTTPS detection issue with Strapi 5.25
       cookie: {
-        secure: env.bool('SESSION_SECURE', true),
+        secure: false,
         httpOnly: true,
         sameSite: env('SESSION_SAMESITE', 'lax'),
         domain: env('SESSION_DOMAIN', undefined),
