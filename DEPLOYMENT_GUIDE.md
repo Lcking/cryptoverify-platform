@@ -171,7 +171,8 @@ If you have already set `proxy: true`, `STRAPI_ADMIN_BACKEND_URL=https://api.gam
 	- `SESSION_SECURE=false`   # temporarily disable Secure flag
 	- `SESSION_SAMESITE=lax`   # default
 	- `SESSION_DOMAIN=`        # optional
-	- `ADMIN_SESSION_COOKIE_SECURE=false`   # Strapi admin refresh cookie
+- In `backend/config/admin.ts`, the admin refresh token cookie inherits from `admin.auth.sessions.options.cookie`. Set in `backend/.env.production`:
+	- `ADMIN_SESSION_COOKIE_SECURE=false`
 	- `ADMIN_SESSION_COOKIE_SAMESITE=lax`
 
 - Optional: If your admin lives behind a sub-path, adjust:

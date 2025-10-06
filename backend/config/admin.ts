@@ -1,6 +1,14 @@
 export default ({ env }) => ({
   auth: {
     secret: env('ADMIN_JWT_SECRET'),
+    sessions: {
+      options: {
+        cookie: {
+          secure: env.bool('ADMIN_SESSION_COOKIE_SECURE', true),
+          sameSite: env('ADMIN_SESSION_COOKIE_SAMESITE', 'lax'),
+        },
+      },
+    },
   },
   apiToken: {
     salt: env('API_TOKEN_SALT'),
@@ -12,10 +20,6 @@ export default ({ env }) => ({
   },
   secrets: {
     encryptionKey: env('ENCRYPTION_KEY'),
-  },
-  session: {
-    secure: env.bool('ADMIN_SESSION_COOKIE_SECURE', true),
-    sameSite: env('ADMIN_SESSION_COOKIE_SAMESITE', 'lax'),
   },
   flags: {
     nps: env.bool('FLAG_NPS', true),
