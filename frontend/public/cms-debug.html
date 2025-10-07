@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS 诊断页面</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { margin-top: 0; color: #333; }
+        h2 { color: #666; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .status { 
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .status.ok { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.warning { background: #fff3cd; color: #856404; }
+        pre {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .test-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .test-btn:hover { background: #0056b3; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔍 CMS 集成诊断页面</h1>
+        <p>此页面用于诊断前端是否正确连接到 CMS。</p>
+    </div>
+
+    <div class="card">
+        <h2>1. 环境变量检查</h2>
+        <div id="envCheck">检查中...</div>
+    </div>
+
+    <div class="card">
+        <h2>2. API 连接测试</h2>
+        <button class="test-btn" onclick="testAPI('platforms')">测试 Platforms API</button>
+        <button class="test-btn" onclick="testAPI('news')">测试 News API</button>
+        <button class="test-btn" onclick="testAPI('insights')">测试 Insights API</button>
+        <div id="results"></div>
+    </div>
+
+    <div class="card">
+        <h2>3. 构建信息</h2>
+        <div id="buildInfo">加载中...</div>
+    </div>
+
+    <script>
+        // 1. 检查环境变量
+        function checkEnvironment() {
+            const envCheck = document.getElementById('envCheck');
+            const checks = [];
+
+            // 检查 window 上是否有 CMS 配置
+            if (typeof window.__CMS_CONFIG__ !== 'undefined') {
+                checks.push(`<p><span class="status ok">✓</span> 全局配置已注入</p>`);
+                checks.push(`<pre>${JSON.stringify(window.__CMS_CONFIG__, null, 2)}</pre>`);
+            }
+
+            // 检查构建时的环境变量 (这些不会在浏览器中可见，但我们可以推断)
+            checks.push(`<p><strong>预期配置：</strong></p>`);
+            checks.push(`<pre>ENABLE_CMS: true\nCMS_URL: https://api.gambleverify.com</pre>`);
+
+            // 检查 localStorage
+            const localKeys = Object.keys(localStorage);
+            if (localKeys.length > 0) {
+                checks.push(`<p><strong>localStorage keys:</strong> ${localKeys.join(', ')}</p>`);
+            }
+
+            envCheck.innerHTML = checks.join('');
+        }
+
+        // 2. 测试 API 连接
+        async function testAPI(endpoint) {
+            const results = document.getElementById('results');
+            const startTime = Date.now();
+            
+            results.innerHTML += `<p>🔄 测试 ${endpoint}...</p>`;
+
+            try {
+                const response = await fetch(`https://api.gambleverify.com/api/${endpoint}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    // 不要发送凭据，Strapi Public API 不需要
+                });
+
+                const duration = Date.now() - startTime;
+                const data = await response.json();
+
+                if (response.ok) {
+                    results.innerHTML += `
+                        <p><span class="status ok">✓</span> ${endpoint} API: ${response.status} (${duration}ms)</p>
+                        <pre>${JSON.stringify(data, null, 2).substring(0, 500)}...</pre>
+                    `;
+                } else {
+                    results.innerHTML += `
+                        <p><span class="status error">✗</span> ${endpoint} API: ${response.status} ${response.statusText}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                results.innerHTML += `
+                    <p><span class="status error">✗</span> ${endpoint} API 请求失败</p>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+
+        // 3. 显示构建信息
+        function showBuildInfo() {
+            const buildInfo = document.getElementById('buildInfo');
+            const scripts = Array.from(document.scripts);
+            const mainScript = scripts.find(s => s.src.includes('main.'));
+            
+            if (mainScript) {
+                buildInfo.innerHTML = `
+                    <p><strong>Main JS:</strong> ${mainScript.src}</p>
+                    <p><strong>User Agent:</strong> ${navigator.userAgent}</p>
+                    <p><strong>当前时间:</strong> ${new Date().toISOString()}</p>
+                `;
+            }
+        }
+
+        // 页面加载时自动运行检查
+        window.addEventListener('DOMContentLoaded', () => {
+            checkEnvironment();
+            showBuildInfo();
+        });
+    </script>
+</body>
+</html>
