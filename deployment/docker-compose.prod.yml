@@ -8,8 +8,15 @@ services:
     working_dir: /srv/frontend
     environment:
       NODE_ENV: production
-    env_file:
-      - ../frontend/.env.production
+      # Explicitly set React env vars to ensure they're injected during build
+      REACT_APP_ENABLE_CMS: "true"
+      REACT_APP_CMS_URL: "https://api.gambleverify.com"
+      REACT_APP_CMS_TOKEN: ""
+      REACT_APP_SITE_URL: "https://app.gambleverify.com"
+      REACT_APP_SITE_NAME: "CryptoVerify"
+      REACT_APP_TELEGRAM_URL: "https://t.me/cryptoverify"
+      REACT_APP_WHATSAPP_URL: "https://wa.me/1234567890"
+      REACT_APP_DISCORD_URL: "https://discord.gg/cryptoverify"
     command: sh -c "npm ci && npm run build"
     volumes:
       - ../frontend:/srv/frontend

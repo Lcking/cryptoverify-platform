@@ -27,7 +27,16 @@ gambleverify.com {
 api.gambleverify.com {
   encode zstd gzip
   
-  # Handle CORS preflight requests
+  # CORS headers must be set BEFORE handling OPTIONS
+  header {
+    Access-Control-Allow-Origin "https://app.gambleverify.com"
+    Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization"
+    Access-Control-Allow-Credentials "true"
+    Access-Control-Max-Age "86400"
+  }
+  
+  # Handle CORS preflight requests (after headers are set)
   @options method OPTIONS
   respond @options 204
   
@@ -39,14 +48,5 @@ api.gambleverify.com {
     header_up Host {host}
     header_up X-Forwarded-Port 443
     header_up X-Forwarded-For {remote}
-  }
-  
-  # CORS headers for all responses
-  header /* {
-    Access-Control-Allow-Origin "https://app.gambleverify.com"
-    Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
-    Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization"
-    Access-Control-Allow-Credentials "true"
-    Access-Control-Max-Age "86400"
   }
 }
