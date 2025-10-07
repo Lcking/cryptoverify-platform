@@ -1,12 +1,24 @@
 # 🚀 快速部署指南
 
-## 问题摘要
-1. ❌ 环境变量未注入构建 → React 使用默认值（空字符串）
-2. ❌ CORS 配置顺序错误 → OPTIONS 请求无 CORS 头
+## 🎯 真正的问题（已通过浏览器诊断确认）
+
+### 症状
+- ✅ API 请求已发出
+- ✅ 环境变量已注入构建
+- ❌ **CORS 错误：Access-Control-Allow-Origin 头包含重复值**
+
+### 根本原因
+```
+The 'Access-Control-Allow-Origin' header contains multiple values 
+'https://app.gambleverify.com, https://app.gambleverify.com', 
+but only one is allowed.
+```
+
+**问题**：Caddy 和 Strapi 都设置了 CORS 头，导致浏览器收到重复的头，拒绝请求。
 
 ## 修复方案
-1. ✅ docker-compose 显式声明 `REACT_APP_*` 变量
-2. ✅ Caddyfile 调整 `header` 指令到 `respond` 之前
+1. ✅ docker-compose 显式声明 `REACT_APP_*` 变量（已完成）
+2. ✅ **移除 Caddyfile 中的 CORS 配置，让 Strapi 处理**（新修复）
 
 ---
 
@@ -19,7 +31,7 @@ cd /Users/ck/Desktop/Project/cryptoverify-platform
 
 # 提交更改
 git add .
-git commit -m "fix: 环境变量注入和 CORS 配置"
+git commit -m "fix: 移除 Caddy CORS 配置，避免与 Strapi 重复"
 git push origin main
 ```
 
@@ -29,16 +41,14 @@ git push origin main
 # SSH 登录
 ssh root@167.160.189.182
 
-# 拉取更新
+# 拉取更新并修复
 cd /opt/cryptoverify-platform
 git pull
-
-# 运行修复脚本
-chmod +x deployment/fix-cms-final.sh
-bash deployment/fix-cms-final.sh
+chmod +x deployment/fix-cors-duplicate.sh
+bash deployment/fix-cors-duplicate.sh
 ```
 
-脚本会自动完成所有操作，等待 2-3 分钟。
+脚本只需 10 秒完成（只重启 Caddy，不重新构建）。
 
 ### 3️⃣ 验证（在浏览器）
 

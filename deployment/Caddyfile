@@ -27,18 +27,8 @@ gambleverify.com {
 api.gambleverify.com {
   encode zstd gzip
   
-  # CORS headers must be set BEFORE handling OPTIONS
-  header {
-    Access-Control-Allow-Origin "https://app.gambleverify.com"
-    Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
-    Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization"
-    Access-Control-Allow-Credentials "true"
-    Access-Control-Max-Age "86400"
-  }
-  
-  # Handle CORS preflight requests (after headers are set)
-  @options method OPTIONS
-  respond @options 204
+  # Let Strapi handle CORS - don't set headers here to avoid duplication
+  # Strapi's CORS middleware is configured in backend/config/middlewares.ts
   
   reverse_proxy strapi:1337 {
     # Ensure Strapi sees the original scheme/host for secure cookies
