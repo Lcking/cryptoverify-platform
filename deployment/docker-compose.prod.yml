@@ -1,6 +1,20 @@
 version: "3.8"
 
 services:
+  # Frontend build service
+  frontend-builder:
+    image: node:20
+    container_name: cryptoverify-frontend-builder
+    working_dir: /srv/frontend
+    environment:
+      NODE_ENV: production
+    env_file:
+      - ../frontend/.env.production
+    command: sh -c "npm ci && npm run build"
+    volumes:
+      - ../frontend:/srv/frontend
+    restart: "no"  # Only run once
+
   caddy:
     image: caddy:2-alpine
     container_name: cryptoverify-caddy
@@ -15,7 +29,10 @@ services:
       # Serve frontend static assets (build output)
       - ../frontend/build:/srv/www:ro
     depends_on:
-      - strapi
+      frontend-builder:
+        condition: service_completed_successfully
+      strapi:
+        condition: service_started
 
   strapi:
     image: node:20
