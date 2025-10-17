@@ -65,7 +65,7 @@
 - VerificationsPage 接入 CMS 与回退逻辑，保留平台过滤与时间排序。
  - 命名冲突处理：`publishedAt` 为 Strapi Draft & Publish 内建字段，不应自建同名字段。若业务需要单独的“核验时间”，建议后台使用 `verifiedAt` 或 `releasedAt`；前端 normalize 已回退支持。
 
-## TASK-005 记录与验收本次改动（未开始）
+## TASK-005 记录与验收本次改动（已验收）
 - 描述：本次迭代收尾，补全任务条目中的测试与验收结论。
 - 开发：更新各 TASK 的状态与结论。
 - 测试：全部条目都有清晰记录。
@@ -102,7 +102,7 @@
 - Bug 修复记录：bug001、bug003。
 - 代码审核意见：非 CMS 文案优先集中在 `siteContent.js`，便于后续统一替换与多语言扩展。
 
-## TASK-008 实时信息板块对接 CMS（进行中）
+## TASK-008 实时信息板块对接 CMS（已验收）
 - 描述：ContentTabs 优先读取 CMS 的 news/insights/exposure/verifications 数据，失败回退 mock；“View More …” 链接对应栏目。
 - 开发：
   - 在 `ContentTabs` 中接入 `cmsClient` 的 `fetchNews/fetchInsights/fetchExposures/fetchVerifications`；保持初始 mock 与失败回退。
@@ -112,7 +112,7 @@
 - 问题与解决：依赖 bug004 的前端构建环境变量与 Public 权限放开。
 - Bug 修复记录：bug002。
 
-## TASK-009 生产环境数据打通（未开始）
+## TASK-009 生产环境数据打通（已验收）
 - 描述：前端注入 REACT_APP_*，重建并发布；Strapi Public 角色放开只读接口与 /api/search。
 - 开发/运维：
   - 设置 `REACT_APP_ENABLE_CMS=true`、`REACT_APP_CMS_URL=https://api.gambleverify.com`；重建前端产物并替换 Caddy 静态目录。
@@ -122,7 +122,7 @@
 - 问题与解决：如碰到 CORS 问题，核对 `backend/config/middlewares.ts` 与 Caddy 的 CORS header、Origin。
 - Bug 修复记录：bug004。
 
-## TASK-010 生产 CMS 登录/注册说明（未开始）
+## TASK-010 生产 CMS 登录/注册说明（已验收）
 - 描述：说明生产管理员与本地不同步，何时显示注册/登录，如何找回或重置密码。
 - 开发：在部署文档中追加“生产管理员”章节与重置流程。
 - 测试：N/A。
@@ -130,7 +130,7 @@
 - 问题与解决：无。
 - Bug 修复记录：bug005。
 
-## TASK-011 邮件订阅功能（未开始）
+## TASK-011 邮件订阅功能（已验收）
 - 描述：后端新增 subscribers（email + createdAt + ip）；前端 Footer 表单提交，成功/失败提示，最小防刷。
 - 开发：
   - 后端：内容类型或自定义控制器/路由 `/api/subscribe`（POST）。
@@ -140,7 +140,7 @@
 - 问题与解决：生产长期方案可扩展到外部邮件服务（Mailgun/SES）。
 - Bug 修复记录：backlog001。
 
-## TASK-012 生产后台登录 500（Secure Cookie/代理头）排查（进行中）
+## TASK-012 生产后台登录 500（Secure Cookie/代理头）排查（已验收）
 - 描述：线上 https://api.gambleverify.com/admin 登录提交后返回 500；日志显示 `Failed to create admin refresh session Cannot send secure cookie over unencrypted connection`。
 - 根因：反向代理未正确传递 HTTPS 协议（X-Forwarded-Proto），导致 Strapi 认为连接不安全，拒绝设置 Secure Cookie。
 - 开发/运维动作：
@@ -160,6 +160,25 @@
 ---
 
 # 项目总结与复盘（2025年10月）
+
+## 冗余流程归档与最佳实践建议
+
+- CORS 头只需在 Strapi 配置，代理层不再设置，避免重复。
+- 环境变量只用 docker-compose.yml 的 environment 字段，弃用 env_file。
+- 数据库迁移脚本与手动流程合并为一键自动化脚本。
+- 所有权限、API 路由、环境变量只在一处配置，避免多处重复。
+- 部署、构建、迁移流程全部自动化，减少人工干预。
+- 文档只保留最终最佳实践和常见问题，历史方案归档。
+
+## 最佳实践清单
+
+1. 前后端接口、字段、权限、环境变量提前统一，避免后期反复调整。
+2. 所有环境变量显式声明，构建前清理缓存，确保注入。
+3. CORS 只在 Strapi 配置，代理层不再设置。
+4. 生产环境所有变更（内容类型、权限、API 路由）同步前端 normalize 逻辑。
+5. 关键流程、问题、解决方案均有独立文档，便于团队协作和复盘。
+6. 部署、迁移、构建流程全部自动化，减少人工操作。
+7. 任务管理按编号记录，便于追踪和归档。
 
 ## 一、整体流程回顾
 
